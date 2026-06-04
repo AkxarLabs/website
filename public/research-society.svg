@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Abstract society simulation visual">
+  <rect width="900" height="520" fill="#f8f1e8" />
+  <g fill="none" stroke="#536b7c" stroke-linecap="round" stroke-width="2">
+    <path d="M170 360c80-150 190-214 330-192s222 102 250 240" opacity=".48" />
+    <path d="M212 230c92 60 190 86 294 78s170-52 220-132" opacity=".32" />
+    <path d="M250 404c108-72 216-96 324-72s168 52 220 82" opacity=".24" />
+  </g>
+  <g fill="#fffaf3" stroke="#a97955" stroke-width="2">
+    <circle cx="224" cy="302" r="18" />
+    <circle cx="380" cy="194" r="18" />
+    <circle cx="552" cy="230" r="18" />
+    <circle cx="702" cy="342" r="18" />
+    <circle cx="458" cy="360" r="18" />
+  </g>
+</svg>

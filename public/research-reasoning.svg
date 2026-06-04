@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Abstract reasoning evaluation visual">
+  <rect width="900" height="520" fill="#f8f1e8" />
+  <g fill="none" stroke="#b99a7d" stroke-linecap="round" stroke-width="2">
+    <path d="M114 376c136-88 242-88 318 0s182 88 318 0" opacity=".55" />
+    <path d="M114 298c136-88 242-88 318 0s182 88 318 0" opacity=".35" />
+    <path d="M114 220c136-88 242-88 318 0s182 88 318 0" opacity=".2" />
+  </g>
+  <g fill="#111314">
+    <circle cx="236" cy="318" r="8" />
+    <circle cx="450" cy="258" r="8" />
+    <circle cx="664" cy="318" r="8" />
+  </g>
+  <circle cx="680" cy="176" r="66" fill="#fffaf3" stroke="#d6c7b8" stroke-width="2" />
+  <path d="M650 176h60M680 146v60" stroke="#6f7d6a" stroke-linecap="round" stroke-width="2" />
+</svg>

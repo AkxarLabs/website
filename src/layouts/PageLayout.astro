@@ -1,0 +1,45 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../lib/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  eyebrow?: string;
+  heroImage?: string;
+  pageTitle?: string;
+}
+
+const { title, description, eyebrow, heroImage, pageTitle } = Astro.props;
+const headTitle = pageTitle ?? `${title} — ${site.name}`;
+---
+
+<BaseLayout title={headTitle} description={description} image={heroImage}>
+  <div class="page">
+    <SiteHeader />
+
+    <main class="page-main">
+      {
+        heroImage && (
+          <div class="page-hero">
+            <img src={heroImage} alt="" />
+          </div>
+        )
+      }
+
+      <section class="page-head">
+        {eyebrow && <div class="page-eyebrow">{eyebrow}</div>}
+        <h1 class="page-title">{title}</h1>
+        {description && <p class="page-deck">{description}</p>}
+      </section>
+
+      <div class="page-body">
+        <slot />
+      </div>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>

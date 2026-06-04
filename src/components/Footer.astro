@@ -1,0 +1,32 @@
+---
+import { navItems, site, withBase } from '../lib/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="site-footer__inner">
+    <div>
+      <div class="site-footer__brand">{site.name}</div>
+      <p class="site-footer__note">Research updates, field notes, and lab announcements.</p>
+    </div>
+    <nav class="site-footer__nav" aria-label="Footer">
+      {navItems.map((item) => <a href={withBase(item.href)}>{item.label}</a>)}
+      <a href={`mailto:${site.email}`}>Contact</a>
+      <a href={withBase('/rss.xml')}>RSS</a>
+    </nav>
+    <form
+      class="newsletter-form"
+      action={`mailto:${site.email}`}
+      method="post"
+      enctype="text/plain"
+    >
+      <label for="newsletter-email">Stay in the loop</label>
+      <div>
+        <input id="newsletter-email" type="email" name="email" placeholder="Email address" />
+        <button type="submit">Subscribe</button>
+      </div>
+    </form>
+    <div class="site-footer__meta">© {year} {site.name}. Template text for illustration.</div>
+  </div>
+</footer>

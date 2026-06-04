@@ -1,0 +1,43 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { withBase } from '../../lib/site';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => +b.data.date - +a.data.date,
+);
+
+const fmt = (d: Date) =>
+  `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}.${d.getFullYear()}`;
+---
+
+<PageLayout
+  title="Research notes and essays."
+  eyebrow="Research"
+  description="A simple publication system for papers, lab notes, dataset releases, and longer-form thinking."
+>
+  <div class="research-grid">
+    {
+      posts.map((post) => (
+        <a class="research-card" href={withBase(`/research/${post.id}`)}>
+          <div class="research-card__cover">
+            <img src={withBase(post.data.cover)} alt="" loading="lazy" />
+          </div>
+          <div class="research-card__meta">
+            <span>{fmt(post.data.date)}</span>
+            <span>{post.data.readTime}</span>
+          </div>
+          <h2>{post.data.headline}</h2>
+          <p>{post.data.excerpt}</p>
+          {post.data.tags.length > 0 && (
+            <div class="research-card__tags">
+              {post.data.tags.map((tag) => (
+                <span>{tag}</span>
+              ))}
+            </div>
+          )}
+        </a>
+      ))
+    }
+  </div>
+</PageLayout>

@@ -1,0 +1,77 @@
+---
+import { getCollection, render } from 'astro:content';
+import PageLayout from '../../layouts/PageLayout.astro';
+import { site, withBase } from '../../lib/site';
+
+export async function getStaticPaths() {
+  const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+    (a, b) => +b.data.date - +a.data.date,
+  );
+
+  return posts.map((post, i) => ({
+    params: { slug: post.id },
+    props: {
+      post,
+      prev: posts[i + 1],
+      next: posts[i - 1],
+    },
+  }));
+}
+
+const { post, prev, next } = Astro.props;
+const { Content } = await render(post);
+
+const fmt = (d: Date) =>
+  `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}.${d.getFullYear()}`;
+---
+
+<PageLayout
+  title={post.data.headline}
+  description={post.data.excerpt}
+  eyebrow="Research"
+  heroImage={withBase(post.data.cover)}
+  pageTitle={`${post.data.title} — ${site.name}`}
+>
+  <div class="post-meta">
+    <span>{post.data.author}</span>
+    <span>{fmt(post.data.date)}</span>
+    <span>{post.data.readTime}</span>
+  </div>
+
+  {
+    post.data.tags.length > 0 && (
+      <div class="tag-list" style="margin-top: 24px;">
+        {post.data.tags.map((tag) => (
+          <a href={withBase(`/research/tags/${tag}`)}>{tag}</a>
+        ))}
+      </div>
+    )
+  }
+
+  <div class="prose">
+    <Content />
+  </div>
+
+  <nav class="post-nav" aria-label="Adjacent research posts">
+    {
+      prev ? (
+        <a href={withBase(`/research/${prev.id}`)}>
+          <span>Previous</span>
+          <strong>{prev.data.shortTitle ?? prev.data.title}</strong>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+    {
+      next ? (
+        <a href={withBase(`/research/${next.id}`)}>
+          <span>Next</span>
+          <strong>{next.data.shortTitle ?? next.data.title}</strong>
+        </a>
+      ) : (
+        <span />
+      )
+    }
+  </nav>
+</PageLayout>

@@ -1,0 +1,124 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import HandsConnection from '../components/HandsConnection.astro';
+import Footer from '../components/Footer.astro';
+import { withBase } from '../lib/site';
+
+const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
+  (a, b) => +b.data.date - +a.data.date,
+);
+const featured = posts.find((post) => post.data.featured) ?? posts[0];
+---
+
+<BaseLayout>
+  <div class="site-shell">
+    <SiteHeader />
+
+    <main>
+      <section class="hero" aria-labelledby="home-title">
+        <HandsConnection />
+        <div class="hero-copy">
+          <p class="eyebrow">Research for reliable systems</p>
+          <h1 id="home-title">Human-<em>centered</em><br />AI research.</h1>
+          <p class="hero-deck">
+            Akxar Labs studies reasoning, alignment, and societal impact so advanced AI systems
+            serve people with clarity, care, and measurable reliability.
+          </p>
+          <div class="hero-actions">
+            <a class="button button--dark" href={withBase('/research')}>Explore research -></a>
+            <a class="button button--ghost" href={withBase('/about')}>About us</a>
+          </div>
+          <div class="scroll-cue" aria-hidden="true">
+            <span></span>
+            <span>Scroll to reveal connection</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="focus-row" aria-label="Research focus areas">
+        <a class="focus-card" href={withBase('/research/tags/alignment')}>
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path
+              d="M12 36v-8c0-4 3-7 7-7h10c4 0 7 3 7 7v8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"></path>
+            <circle cx="18" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="1.7"
+            ></circle>
+            <circle cx="30" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="1.7"
+            ></circle>
+          </svg>
+          <span><strong>Alignment</strong><span>Human feedback, governance, and intent.</span></span
+          >
+          <span aria-hidden="true">-></span>
+        </a>
+        <a class="focus-card" href={withBase('/research/tags/reasoning')}>
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <path
+              d="M24 8v13m0 0L13 34m11-13 11 13"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-width="1.7"></path>
+            <circle cx="24" cy="8" r="4" fill="none" stroke="currentColor" stroke-width="1.7"
+            ></circle>
+            <circle cx="13" cy="34" r="4" fill="none" stroke="currentColor" stroke-width="1.7"
+            ></circle>
+            <circle cx="35" cy="34" r="4" fill="none" stroke="currentColor" stroke-width="1.7"
+            ></circle>
+          </svg>
+          <span
+            ><strong>Reasoning</strong><span>Evaluation, calibration, and robustness.</span></span
+          >
+          <span aria-hidden="true">-></span>
+        </a>
+        <a class="focus-card" href={withBase('/research/tags/society')}>
+          <svg viewBox="0 0 48 48" aria-hidden="true">
+            <circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="1.7"
+            ></circle>
+            <path
+              d="M9 24h30M24 9c5 5 7 20 0 30M24 9c-5 5-7 20 0 30"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.7"></path>
+          </svg>
+          <span><strong>Society</strong><span>Deployment effects and public benefit.</span></span>
+          <span aria-hidden="true">-></span>
+        </a>
+      </div>
+
+      {
+        featured && (
+          <section class="featured-research" aria-labelledby="featured-title">
+            <div class="featured-copy">
+              <p class="kicker">Featured research</p>
+              <h2 id="featured-title">{featured.data.headline}</h2>
+              <p>{featured.data.excerpt}</p>
+              <a class="text-link" href={withBase(`/research/${featured.id}`)}>
+                Read the research
+              </a>
+            </div>
+            <div class="research-visual" aria-hidden="true" />
+          </section>
+        )
+      }
+
+      <section class="section" aria-labelledby="method-title">
+        <div class="section-header">
+          <div>
+            <p class="kicker">Method</p>
+            <h2 id="method-title">Simple research artifacts, written for use.</h2>
+          </div>
+          <p>
+            This starter content shows the publishing system: research notes, tags, RSS, and article
+            pages. Replace the examples with papers, memos, datasets, and project updates.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <Footer />
+  </div>
+</BaseLayout>

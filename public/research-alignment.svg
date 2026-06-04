@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" role="img" aria-label="Abstract alignment feedback visual">
+  <rect width="900" height="520" fill="#f8f1e8" />
+  <g fill="none" stroke="#6f7d6a" stroke-width="2">
+    <circle cx="450" cy="260" r="54" />
+    <circle cx="450" cy="260" r="122" opacity=".45" />
+    <circle cx="450" cy="260" r="190" opacity=".22" />
+  </g>
+  <g fill="#fffaf3" stroke="#a97955" stroke-width="2">
+    <circle cx="450" cy="260" r="18" />
+    <circle cx="314" cy="196" r="14" />
+    <circle cx="588" cy="204" r="14" />
+    <circle cx="350" cy="364" r="14" />
+    <circle cx="620" cy="342" r="14" />
+  </g>
+  <g stroke="#a97955" stroke-linecap="round" stroke-width="2">
+    <path d="M328 204l96 48M574 212l-98 44M364 354l74-88M606 334l-91-70" />
+  </g>
+</svg>
