@@ -17,7 +17,8 @@ human/AI hand concept.
 
 ## Components
 
-- `SiteHeader.astro`: brand mark and primary navigation.
+- `SiteHeader.astro`: brand mark, primary navigation, and persisted light/dark
+  mode toggle.
 - `HandsConnection.astro`: scroll-driven hero animation using inline SVG and one
   small script.
 - `Footer.astro`: footer navigation, RSS link, and placeholder email signup.
@@ -31,3 +32,5 @@ human/AI hand concept.
 - Keep research titles direct and readable.
 - Use placeholder copy only until real lab language, publications, and contact
   details are ready.
+- Dark mode should use `data-theme="dark"` tokens rather than one-off color
+  overrides.

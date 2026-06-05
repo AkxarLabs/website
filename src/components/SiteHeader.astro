@@ -26,16 +26,64 @@ const isActive = (href: string) =>
       <span></span>
     </span>
     <span class="brand-name">{site.name}</span>
-    <span class="brand-suffix">{site.suffix}</span>
   </a>
 
-  <nav class="primary-nav" aria-label="Primary">
-    {
-      navItems.map((item) => (
-        <a href={withBase(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
-          {item.label}
-        </a>
-      ))
-    }
-  </nav>
+  <div class="header-actions">
+    <nav class="primary-nav" aria-label="Primary">
+      {
+        navItems.map((item) => (
+          <a href={withBase(item.href)} aria-current={isActive(item.href) ? 'page' : undefined}>
+            {item.label}
+          </a>
+        ))
+      }
+    </nav>
+
+    <button
+      class="theme-toggle"
+      type="button"
+      aria-label="Switch to dark mode"
+      title="Toggle color mode"
+      data-theme-toggle
+    >
+      <svg class="theme-toggle__sun" viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="12" r="4"></circle>
+        <path
+          d="M12 2v2.5M12 19.5V22M4.93 4.93l1.77 1.77M17.3 17.3l1.77 1.77M2 12h2.5M19.5 12H22M4.93 19.07l1.77-1.77M17.3 6.7l1.77-1.77"
+        ></path>
+      </svg>
+      <svg class="theme-toggle__moon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M20 14.4A7.6 7.6 0 0 1 9.6 4a8.2 8.2 0 1 0 10.4 10.4Z"></path>
+      </svg>
+    </button>
+  </div>
 </header>
+
+<script>
+  const storageKey = 'akxar-theme';
+  const toggle = document.querySelector<HTMLButtonElement>('[data-theme-toggle]');
+
+  const setTheme = (theme: 'light' | 'dark') => {
+    document.documentElement.dataset.theme = theme;
+    try {
+      localStorage.setItem(storageKey, theme);
+    } catch {
+      // Keep the visible theme change even if storage is unavailable.
+    }
+    toggle?.setAttribute(
+      'aria-label',
+      theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+    );
+  };
+
+  const initialTheme = document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light';
+  toggle?.setAttribute(
+    'aria-label',
+    initialTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode',
+  );
+
+  toggle?.addEventListener('click', () => {
+    const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    setTheme(nextTheme);
+  });
+</script>

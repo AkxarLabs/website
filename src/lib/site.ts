@@ -1,6 +1,5 @@
 export const site = {
   name: 'Akxar Labs',
-  suffix: 'AI Research',
   title: 'Akxar Labs — Human-centered AI research',
   description:
     'Akxar Labs is an AI research organization studying reliable reasoning, alignment, and human-centered AI systems.',

@@ -10,12 +10,49 @@
   --sage: #6f7d6a;
   --blue: #536b7c;
   --black: #050607;
+  --surface: rgba(255, 250, 243, 0.56);
+  --surface-soft: rgba(255, 250, 243, 0.54);
+  --grid-line-x: rgba(17, 19, 20, 0.035);
+  --grid-line-y: rgba(17, 19, 20, 0.025);
+  --button-solid-bg: #050607;
+  --button-solid-text: #fffaf3;
+  --hand-stroke: #9a806b;
+  --joint-fill: rgba(247, 242, 234, 0.84);
+  --visual-sphere: rgba(247, 250, 243, 0.88);
+  --visual-ring: rgba(17, 19, 20, 0.16);
+  --visual-gradient: linear-gradient(150deg, rgba(83, 107, 124, 0.18), rgba(169, 121, 85, 0.12));
   --radius: 8px;
   --sans:
     Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --display: 'Space Grotesk', Inter, ui-sans-serif, system-ui, sans-serif;
   --serif: Georgia, 'Times New Roman', serif;
   color-scheme: light;
+}
+
+:root[data-theme='dark'] {
+  --ink: #f1ece3;
+  --muted: #b8ada0;
+  --soft: #948a7e;
+  --paper: #11110f;
+  --paper-strong: #1a1815;
+  --line: #342f29;
+  --line-strong: #554a3f;
+  --clay: #d0a176;
+  --sage: #9daa91;
+  --blue: #8cafc1;
+  --black: #050607;
+  --surface: rgba(28, 25, 22, 0.74);
+  --surface-soft: rgba(30, 27, 24, 0.64);
+  --grid-line-x: rgba(241, 236, 227, 0.035);
+  --grid-line-y: rgba(241, 236, 227, 0.026);
+  --button-solid-bg: #f1ece3;
+  --button-solid-text: #11110f;
+  --hand-stroke: #c49a78;
+  --joint-fill: rgba(26, 24, 21, 0.86);
+  --visual-sphere: rgba(241, 236, 227, 0.16);
+  --visual-ring: rgba(241, 236, 227, 0.16);
+  --visual-gradient: linear-gradient(150deg, rgba(83, 107, 124, 0.32), rgba(208, 161, 118, 0.16));
+  color-scheme: dark;
 }
 
 * {
@@ -34,10 +71,13 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    linear-gradient(90deg, rgba(17, 19, 20, 0.035) 1px, transparent 1px) 0 0 / 96px 96px,
-    linear-gradient(rgba(17, 19, 20, 0.025) 1px, transparent 1px) 0 0 / 96px 96px,
+    linear-gradient(90deg, var(--grid-line-x) 1px, transparent 1px) 0 0 / 96px 96px,
+    linear-gradient(var(--grid-line-y) 1px, transparent 1px) 0 0 / 96px 96px,
     var(--paper);
   color: var(--ink);
+  transition:
+    background-color 180ms ease,
+    color 180ms ease;
 }
 
 a {
@@ -102,13 +142,10 @@ textarea {
   text-transform: uppercase;
 }
 
-.brand-suffix {
-  color: var(--muted);
-  font-family: var(--display);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
+.header-actions {
+  align-items: center;
+  display: flex;
+  gap: clamp(18px, 3vw, 36px);
 }
 
 .primary-nav {
@@ -143,6 +180,56 @@ textarea {
 .primary-nav a[aria-current='page']::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+.theme-toggle {
+  align-items: center;
+  background: var(--surface-soft);
+  border: 1px solid var(--line-strong);
+  border-radius: 999px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 auto;
+  height: 38px;
+  justify-content: center;
+  padding: 0;
+  position: relative;
+  width: 38px;
+}
+
+.theme-toggle svg {
+  fill: none;
+  height: 18px;
+  position: absolute;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+  transition:
+    opacity 140ms ease,
+    transform 140ms ease;
+  width: 18px;
+}
+
+.theme-toggle__sun {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
+}
+
+.theme-toggle__moon {
+  opacity: 0;
+  transform: rotate(-18deg) scale(0.72);
+}
+
+:root[data-theme='dark'] .theme-toggle__sun {
+  opacity: 0;
+  transform: rotate(18deg) scale(0.72);
+}
+
+:root[data-theme='dark'] .theme-toggle__moon {
+  opacity: 1;
+  transform: rotate(0deg) scale(1);
 }
 
 .hero {
@@ -222,13 +309,13 @@ textarea {
 }
 
 .button--dark {
-  background: var(--black);
-  border-color: var(--black);
-  color: var(--paper-strong);
+  background: var(--button-solid-bg);
+  border-color: var(--button-solid-bg);
+  color: var(--button-solid-text);
 }
 
 .button--ghost {
-  background: rgba(255, 250, 243, 0.54);
+  background: var(--surface-soft);
 }
 
 .scroll-cue {
@@ -295,7 +382,7 @@ textarea {
 
 .hand-line {
   fill: none;
-  stroke: #9a806b;
+  stroke: var(--hand-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 1.45;
@@ -307,8 +394,8 @@ textarea {
 }
 
 .joint {
-  fill: rgba(247, 242, 234, 0.84);
-  stroke: #9a806b;
+  fill: var(--joint-fill);
+  stroke: var(--hand-stroke);
   stroke-width: 1.6;
 }
 
@@ -352,9 +439,12 @@ textarea {
 .featured-research,
 .research-card,
 .value-card {
-  background: rgba(255, 250, 243, 0.56);
+  background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
 }
 
 .focus-card {
@@ -443,8 +533,8 @@ textarea {
 .research-visual {
   align-self: stretch;
   background:
-    radial-gradient(circle at 74% 30%, rgba(247, 250, 243, 0.88) 0 54px, transparent 55px),
-    linear-gradient(150deg, rgba(83, 107, 124, 0.18), rgba(169, 121, 85, 0.12));
+    radial-gradient(circle at 74% 30%, var(--visual-sphere) 0 54px, transparent 55px),
+    var(--visual-gradient);
   border: 1px solid var(--line);
   border-radius: var(--radius);
   min-height: 210px;
@@ -454,7 +544,7 @@ textarea {
 
 .research-visual::before,
 .research-visual::after {
-  border: 1px solid rgba(17, 19, 20, 0.16);
+  border: 1px solid var(--visual-ring);
   border-radius: 50%;
   content: '';
   height: 260px;
@@ -778,8 +868,15 @@ textarea {
 
 @media (max-width: 900px) {
   .site-header {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px 28px;
+    padding: 28px 22px 14px;
+  }
+
+  .header-actions {
+    justify-content: space-between;
+    width: 100%;
   }
 
   .hero {
@@ -818,23 +915,44 @@ textarea {
 
 @media (max-width: 560px) {
   .site-header {
-    padding-top: 24px;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 22px 18px 10px;
   }
 
   .brand {
-    align-items: flex-start;
-    flex-wrap: wrap;
+    gap: 12px;
   }
 
-  .brand-suffix {
-    flex-basis: 100%;
-    margin-left: 36px;
+  .brand-mark {
+    gap: 2.5px;
+    grid-template-columns: repeat(3, 4.5px);
+  }
+
+  .brand-mark span {
+    height: 4.5px;
+    width: 4.5px;
+  }
+
+  .brand-name {
+    font-size: 1.05rem;
+    letter-spacing: 0.22em;
   }
 
   .primary-nav {
-    gap: 22px;
+    flex: 1;
+    gap: 20px;
     overflow-x: auto;
-    width: 100%;
+  }
+
+  .primary-nav a {
+    font-size: 0.88rem;
+    padding-bottom: 6px;
+  }
+
+  .theme-toggle {
+    height: 34px;
+    width: 34px;
   }
 
   .hero,

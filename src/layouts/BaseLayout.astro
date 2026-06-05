@@ -41,6 +41,23 @@ const ogImage = image ? new URL(image, Astro.site ?? Astro.url).toString() : und
     <meta name="twitter:description" content={description} />
     {ogImage && <meta name="twitter:image" content={ogImage} />}
 
+    <script is:inline>
+      (() => {
+        const storageKey = 'akxar-theme';
+        const root = document.documentElement;
+        let stored = null;
+        try {
+          stored = localStorage.getItem(storageKey);
+        } catch {
+          stored = null;
+        }
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme =
+          stored === 'light' || stored === 'dark' ? stored : prefersDark ? 'dark' : 'light';
+        root.dataset.theme = theme;
+      })();
+    </script>
+
     <title>{title}</title>
   </head>
   <body>
