@@ -350,14 +350,23 @@ textarea {
 
 .hands-scene {
   --clasp: 0;
+  --px: 0;
+  --py: 0;
   height: min(42vw, 520px);
   inset: clamp(86px, 12vh, 140px) 0 auto;
   margin: 0 auto;
   max-width: 1420px;
+  perspective: 1200px;
   pointer-events: none;
   position: absolute;
   width: 100%;
   z-index: 1;
+}
+
+.hands-depth {
+  inset: 0;
+  position: absolute;
+  transform-style: preserve-3d;
 }
 
 .connection-lines,
@@ -366,18 +375,47 @@ textarea {
   position: absolute;
 }
 
+// Pointer-driven parallax: each layer shifts by its own depth factor (--lx/--ly
+// are computed per-layer in the component script from data-depth).
+[data-parallax] {
+  --lx: 0;
+  --ly: 0;
+  will-change: transform;
+}
+
+.connection-lines[data-parallax] {
+  transform: translate3d(calc(var(--lx) * 40px), calc(var(--ly) * 26px), 0);
+}
+
 .connection-lines path {
   fill: none;
-  opacity: 0.32;
+  opacity: calc(0.22 + var(--clasp) * 0.28);
   stroke: var(--clay);
   stroke-dasharray: 1 8;
   stroke-linecap: round;
   stroke-width: 1.2;
+  transition: opacity 200ms linear;
 }
 
 .connection-lines circle {
   fill: var(--clay);
   opacity: 0.22;
+}
+
+.hands-glow {
+  background: radial-gradient(
+    closest-side,
+    rgba(169, 121, 85, calc(0.16 + var(--clasp) * 0.22)),
+    transparent 72%
+  );
+  height: 52%;
+  left: 50%;
+  opacity: calc(0.4 + var(--clasp) * 0.6);
+  position: absolute;
+  top: 52%;
+  transform: translate(-50%, -50%) translate3d(calc(var(--px) * 14px), calc(var(--py) * 10px), 0);
+  transition: opacity 240ms ease;
+  width: 46%;
 }
 
 .hand-line {
@@ -399,22 +437,89 @@ textarea {
   stroke-width: 1.6;
 }
 
+.fingertip {
+  fill: var(--clay);
+  opacity: calc(var(--clasp) * var(--clasp));
+  transition: opacity 200ms linear;
+}
+
 .human-hand,
 .robot-hand {
   opacity: calc(0.58 + var(--clasp) * 0.42);
   transform-box: fill-box;
   transform-origin: center;
   transition: opacity 120ms linear;
+  will-change: transform;
 }
 
 .human-hand {
-  transform: translateX(calc(var(--clasp) * 108px)) translateY(calc(var(--clasp) * -8px))
+  transform: translate3d(
+      calc(var(--clasp) * 108px + var(--lx) * 30px),
+      calc(var(--clasp) * -8px + var(--ly) * 22px),
+      0
+    )
     rotate(calc(var(--clasp) * -3deg));
 }
 
 .robot-hand {
-  transform: translateX(calc(var(--clasp) * -118px)) translateY(calc(var(--clasp) * 8px))
+  transform: translate3d(
+      calc(var(--clasp) * -118px + var(--lx) * 34px),
+      calc(var(--clasp) * 8px + var(--ly) * 24px),
+      0
+    )
     rotate(calc(var(--clasp) * 3deg));
+}
+
+// Spark at the point where the fingertips meet; intensifies as hands clasp.
+.connection-spark {
+  height: 120px;
+  left: 50%;
+  opacity: calc(var(--clasp) * var(--clasp));
+  position: absolute;
+  top: 58%;
+  transform: translate(-50%, -50%) translate3d(calc(var(--lx) * 46px), calc(var(--ly) * 30px), 0);
+  width: 120px;
+}
+
+.spark-core {
+  background: radial-gradient(circle, var(--paper-strong) 0 18%, var(--clay) 30%, transparent 70%);
+  border-radius: 50%;
+  height: 22px;
+  inset: 0;
+  margin: auto;
+  position: absolute;
+  width: 22px;
+}
+
+.spark-ring {
+  animation: spark-pulse 2.8s ease-out infinite;
+  border: 1px solid var(--clay);
+  border-radius: 50%;
+  height: 22px;
+  inset: 0;
+  margin: auto;
+  opacity: 0;
+  position: absolute;
+  width: 22px;
+}
+
+.spark-ring--delayed {
+  animation-delay: 1.4s;
+}
+
+@keyframes spark-pulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(0.7);
+  }
+  80% {
+    opacity: 0;
+    transform: scale(3.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(3.4);
+  }
 }
 
 .focus-row,

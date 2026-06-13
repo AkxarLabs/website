@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import SiteHeader from '../components/SiteHeader.astro';
 import HandsConnection from '../components/HandsConnection.astro';
 import Footer from '../components/Footer.astro';
-import { withBase } from '../lib/site';
+import { site, withBase } from '../lib/site';
 
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => +b.data.date - +a.data.date,
@@ -20,19 +20,20 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
       <section class="hero" aria-labelledby="home-title">
         <HandsConnection />
         <div class="hero-copy">
-          <p class="eyebrow">Research for reliable systems</p>
-          <h1 id="home-title">Human-<em>centered</em><br />AI research.</h1>
+          <p class="eyebrow">Collaborative AI safety lab</p>
+          <h1 id="home-title">Safe AI, built <em>together</em>.</h1>
           <p class="hero-deck">
-            Akxar Labs studies reasoning, alignment, and societal impact so advanced AI systems
-            serve people with clarity, care, and measurable reliability.
+            Akxar Labs is an open, collaborative AI safety lab. We work in the open on alignment,
+            evaluation, and human oversight — so the people building and using advanced AI stay
+            meaningfully in control.
           </p>
           <div class="hero-actions">
             <a class="button button--dark" href={withBase('/research')}>Explore research -></a>
-            <a class="button button--ghost" href={withBase('/about')}>About us</a>
+            <a class="button button--ghost" href="#collaborate">Collaborate with us</a>
           </div>
           <div class="scroll-cue" aria-hidden="true">
             <span></span>
-            <span>Scroll to reveal connection</span>
+            <span>Scroll to join the hands</span>
           </div>
         </div>
       </section>
@@ -50,7 +51,7 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
             <circle cx="30" cy="15" r="4" fill="none" stroke="currentColor" stroke-width="1.7"
             ></circle>
           </svg>
-          <span><strong>Alignment</strong><span>Human feedback, governance, and intent.</span></span
+          <span><strong>Alignment</strong><span>Keeping capable systems pointed at human intent.</span></span
           >
           <span aria-hidden="true">-></span>
         </a>
@@ -70,7 +71,7 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
             ></circle>
           </svg>
           <span
-            ><strong>Reasoning</strong><span>Evaluation, calibration, and robustness.</span></span
+            ><strong>Evaluation</strong><span>Stress-testing reasoning, calibration, and failure modes.</span></span
           >
           <span aria-hidden="true">-></span>
         </a>
@@ -84,7 +85,7 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
               stroke="currentColor"
               stroke-width="1.7"></path>
           </svg>
-          <span><strong>Society</strong><span>Deployment effects and public benefit.</span></span>
+          <span><strong>Oversight</strong><span>Human control, governance, and public benefit.</span></span>
           <span aria-hidden="true">-></span>
         </a>
       </div>
@@ -105,16 +106,44 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
         )
       }
 
-      <section class="section" aria-labelledby="method-title">
+      <section class="section" id="collaborate" aria-labelledby="collaborate-title">
         <div class="section-header">
           <div>
-            <p class="kicker">Method</p>
-            <h2 id="method-title">Simple research artifacts, written for use.</h2>
+            <p class="kicker">Collaborate</p>
+            <h2 id="collaborate-title">Safety is a shared problem.</h2>
           </div>
           <p>
-            This starter content shows the publishing system: research notes, tags, RSS, and article
-            pages. Replace the examples with papers, memos, datasets, and project updates.
+            We treat safety research as a commons: open problems, open methods, and open tools.
+            There are several ways to work with us — whether you are a researcher, an engineer, or a
+            lab looking for partners.
           </p>
+        </div>
+        <div class="values-grid">
+          <article class="value-card">
+            <h3>Open problems</h3>
+            <p>
+              A living list of concrete, tractable safety questions you can pick up — with data,
+              baselines, and context to start fast.
+            </p>
+          </article>
+          <article class="value-card">
+            <h3>Visiting researchers</h3>
+            <p>
+              Short residencies and remote collaborations for students and researchers who want to
+              co-author work and share results.
+            </p>
+          </article>
+          <article class="value-card">
+            <h3>Partner with us</h3>
+            <p>
+              Labs and teams can co-run evaluations, share infrastructure, and publish jointly under
+              shared safety standards.
+            </p>
+          </article>
+        </div>
+        <div class="hero-actions" style="justify-content: flex-start; margin-top: 28px;">
+          <a class="button button--dark" href={`mailto:${site.email}`}>Get involved -></a>
+          <a class="button button--ghost" href={withBase('/research')}>See open work</a>
         </div>
       </section>
     </main>

@@ -8,7 +8,10 @@ const year = new Date().getFullYear();
   <div class="site-footer__inner">
     <div>
       <div class="site-footer__brand">{site.name}</div>
-      <p class="site-footer__note">Research updates, field notes, and lab announcements.</p>
+      <p class="site-footer__note">
+        An open, collaborative AI safety lab. Research updates, open problems, and lab
+        announcements.
+      </p>
     </div>
     <nav class="site-footer__nav" aria-label="Footer">
       {navItems.map((item) => <a href={withBase(item.href)}>{item.label}</a>)}
@@ -27,6 +30,6 @@ const year = new Date().getFullYear();
         <button type="submit">Subscribe</button>
       </div>
     </form>
-    <div class="site-footer__meta">© {year} {site.name}. Template text for illustration.</div>
+    <div class="site-footer__meta">© {year} {site.name}. Open, collaborative AI safety research.</div>
   </div>
 </footer>

@@ -1,8 +1,8 @@
 export const site = {
   name: 'Akxar Labs',
-  title: 'Akxar Labs — Human-centered AI research',
+  title: 'Akxar Labs — Collaborative AI safety research',
   description:
-    'Akxar Labs is an AI research organization studying reliable reasoning, alignment, and human-centered AI systems.',
+    'Akxar Labs is an open, collaborative AI safety lab working on alignment, evaluation, and human oversight of advanced AI systems.',
   email: 'hello@akxarlabs.org',
   repository: 'https://github.com/AkxarLabs/website',
 };
