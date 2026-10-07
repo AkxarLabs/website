@@ -8,6 +8,7 @@ readTime: '5 Min Read'
 date: 2025-12-18
 cover: '/research-society.svg'
 featured: false
+draft: true
 tags: ['society', 'simulation', 'deployment']
 ---
 

@@ -20,26 +20,25 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
       <section class="hero" aria-labelledby="home-title">
         <HandsConnection />
         <div class="hero-copy">
-          <p class="eyebrow">Collaborative AI safety lab</p>
-          <h1 id="home-title">Safe AI, built <em>together</em>.</h1>
+          <p class="eyebrow">AI safety research</p>
+          <h1 id="home-title">Studying AI agents, <em>together</em>.</h1>
           <p class="hero-deck">
-            Akxar Labs is an open, collaborative AI safety lab. We work in the open on alignment,
-            evaluation, and human oversight — so the people building and using advanced AI stay
-            meaningfully in control.
+            Akxar Labs is an early-stage research lab building open environments and oversight tools
+            to study how AI agents behave, individually and in groups.
           </p>
           <div class="hero-actions">
-            <a class="button button--dark" href={withBase('/research')}>Explore research -></a>
-            <a class="button button--ghost" href="#collaborate">Collaborate with us</a>
+            <a class="button button--dark" href={withBase('/research')}>Our research →</a>
+            <a class="button button--ghost" href={`mailto:${site.email}`}>Get in touch</a>
           </div>
           <div class="scroll-cue" aria-hidden="true">
             <span></span>
-            <span>Scroll to join the hands</span>
+            <span>Scroll</span>
           </div>
         </div>
       </section>
 
       <div class="focus-row" aria-label="Research focus areas">
-        <a class="focus-card" href={withBase('/research/tags/alignment')}>
+        <a class="focus-card" href={withBase('/research')}>
           <svg viewBox="0 0 48 48" aria-hidden="true">
             <path
               d="M12 36v-8c0-4 3-7 7-7h10c4 0 7 3 7 7v8"
@@ -52,12 +51,13 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
             ></circle>
           </svg>
           <span
-            ><strong>Alignment</strong><span>Keeping capable systems pointed at human intent.</span
+            ><strong>Scenario design</strong><span
+              >Environments that probe specific behavioral dispositions.</span
             ></span
           >
-          <span aria-hidden="true">-></span>
+          <span aria-hidden="true">→</span>
         </a>
-        <a class="focus-card" href={withBase('/research/tags/reasoning')}>
+        <a class="focus-card" href={withBase('/research')}>
           <svg viewBox="0 0 48 48" aria-hidden="true">
             <path
               d="M24 8v13m0 0L13 34m11-13 11 13"
@@ -73,13 +73,13 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
             ></circle>
           </svg>
           <span
-            ><strong>Evaluation</strong><span
-              >Stress-testing reasoning, calibration, and failure modes.</span
+            ><strong>Multi-agent oversight</strong><span
+              >Monitoring and control for agent systems at scale.</span
             ></span
           >
-          <span aria-hidden="true">-></span>
+          <span aria-hidden="true">→</span>
         </a>
-        <a class="focus-card" href={withBase('/research/tags/society')}>
+        <a class="focus-card" href={withBase('/research')}>
           <svg viewBox="0 0 48 48" aria-hidden="true">
             <circle cx="24" cy="24" r="15" fill="none" stroke="currentColor" stroke-width="1.7"
             ></circle>
@@ -90,10 +90,11 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
               stroke-width="1.7"></path>
           </svg>
           <span
-            ><strong>Oversight</strong><span>Human control, governance, and public benefit.</span
+            ><strong>Open infrastructure</strong><span
+              >Shared environments researchers can build on.</span
             ></span
           >
-          <span aria-hidden="true">-></span>
+          <span aria-hidden="true">→</span>
         </a>
       </div>
 
@@ -113,44 +114,43 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
         )
       }
 
-      <section class="section" id="collaborate" aria-labelledby="collaborate-title">
+      <section class="section" id="research" aria-labelledby="directions-title">
         <div class="section-header">
           <div>
-            <p class="kicker">Collaborate</p>
-            <h2 id="collaborate-title">Safety is a shared problem.</h2>
+            <p class="kicker">Research directions</p>
+            <h2 id="directions-title">Evaluating agents in open-ended settings.</h2>
           </div>
           <p>
-            We treat safety research as a commons: open problems, open methods, and open tools.
-            There are several ways to work with us — whether you are a researcher, an engineer, or a
-            lab looking for partners.
+            Open-ended multi-agent environments surface behavior that short, single-agent
+            evaluations miss: long-horizon coordination, mutual influence, and unexpected
+            strategies. We are building the tools to study it.
           </p>
         </div>
         <div class="values-grid">
           <article class="value-card">
-            <h3>Open problems</h3>
+            <h3>Scenario design</h3>
             <p>
-              A living list of concrete, tractable safety questions you can pick up — with data,
-              baselines, and context to start fast.
+              Scenarios that probe dispositions such as cooperation, deception, and resource
+              acquisition, varied across agent count, model, and autonomy.
             </p>
           </article>
           <article class="value-card">
-            <h3>Visiting researchers</h3>
+            <h3>Oversight and monitoring</h3>
             <p>
-              Short residencies and remote collaborations for students and researchers who want to
-              co-author work and share results.
+              Interfaces for observing and steering multi-agent simulations, and a testbed for
+              comparing oversight and control mechanisms.
             </p>
           </article>
           <article class="value-card">
-            <h3>Partner with us</h3>
+            <h3>Shared infrastructure</h3>
             <p>
-              Labs and teams can co-run evaluations, share infrastructure, and publish jointly under
-              shared safety standards.
+              Common environments and monitoring tools that other researchers can use with their own
+              questions and agents.
             </p>
           </article>
         </div>
         <div class="hero-actions" style="justify-content: flex-start; margin-top: 28px;">
-          <a class="button button--dark" href={`mailto:${site.email}`}>Get involved -></a>
-          <a class="button button--ghost" href={withBase('/research')}>See open work</a>
+          <a class="button button--dark" href={`mailto:${site.email}`}>Get in touch →</a>
         </div>
       </section>
     </main>

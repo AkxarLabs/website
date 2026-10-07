@@ -53,9 +53,9 @@ Local cover assets live in `public/`. Global site metadata and navigation live i
 The workflow in `.github/workflows/deploy-pages.yml` validates pull requests and
 deploys `dist/` on pushes to `main` using GitHub Pages artifacts.
 
-For the `AkxarLabs/website` repository, Astro defaults to:
+The site is served from the custom domain in `CNAME`. Astro defaults to:
 
-- `site`: `https://akxarlabs.github.io`
-- `base`: `/website`
+- `site`: `https://akxar.xyz`
+- `base`: `/`
 
 Override these in Actions or another host with `SITE` and `BASE_PATH`.

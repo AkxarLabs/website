@@ -17,7 +17,8 @@
   --button-solid-bg: #050607;
   --button-solid-text: #fffaf3;
   --hand-stroke: #9a806b;
-  --joint-fill: rgba(247, 242, 234, 0.84);
+  --hand-fill: rgba(154, 128, 107, 0.05);
+  --joint-fill: rgba(247, 242, 234, 0.88);
   --visual-sphere: rgba(247, 250, 243, 0.88);
   --visual-ring: rgba(17, 19, 20, 0.16);
   --visual-gradient: linear-gradient(150deg, rgba(83, 107, 124, 0.18), rgba(169, 121, 85, 0.12));
@@ -48,7 +49,8 @@
   --button-solid-bg: #f1ece3;
   --button-solid-text: #11110f;
   --hand-stroke: #c49a78;
-  --joint-fill: rgba(26, 24, 21, 0.86);
+  --hand-fill: rgba(196, 154, 120, 0.07);
+  --joint-fill: rgba(26, 24, 21, 0.9);
   --visual-sphere: rgba(241, 236, 227, 0.16);
   --visual-ring: rgba(241, 236, 227, 0.16);
   --visual-gradient: linear-gradient(150deg, rgba(83, 107, 124, 0.32), rgba(208, 161, 118, 0.16));
@@ -243,7 +245,7 @@ textarea {
 
 .hero-copy {
   margin: 0 auto;
-  max-width: 640px;
+  max-width: 720px;
   padding-top: clamp(54px, 11vh, 128px);
   position: relative;
   text-align: center;
@@ -264,11 +266,20 @@ textarea {
 .hero h1,
 .page-title {
   font-family: var(--display);
-  font-size: clamp(3rem, 7.2vw, 6.9rem);
+  font-size: clamp(2.7rem, 6.4vw, 5.9rem);
   font-weight: 500;
   letter-spacing: 0;
-  line-height: 0.98;
+  line-height: 1.02;
   margin: 0;
+  overflow-wrap: break-word;
+  text-wrap: balance;
+}
+
+// Compact variant for article and tag pages, where titles are sentences
+// rather than a short display headline.
+.page-title--compact {
+  font-size: clamp(2.1rem, 4.2vw, 3.6rem);
+  line-height: 1.1;
 }
 
 .hero h1 em,
@@ -285,6 +296,12 @@ textarea {
   line-height: 1.55;
   margin: 24px auto 0;
   max-width: 620px;
+}
+
+// Page decks sit under left-aligned titles; only the hero deck is centered.
+.page-deck {
+  margin-left: 0;
+  margin-right: 0;
 }
 
 .hero-actions {
@@ -326,6 +343,9 @@ textarea {
   gap: 12px;
   justify-content: center;
   margin-top: clamp(32px, 6vh, 70px);
+  // Fade out as the hands join — the cue has served its purpose and would
+  // otherwise sit right on the meeting point.
+  opacity: calc(1 - var(--clasp, 0));
 }
 
 .scroll-cue span:first-child {
@@ -352,27 +372,34 @@ textarea {
   --clasp: 0;
   --px: 0;
   --py: 0;
+  --scroll-shift: 0px;
   height: min(42vw, 520px);
   inset: clamp(86px, 12vh, 140px) 0 auto;
   margin: 0 auto;
   max-width: 1420px;
-  perspective: 1200px;
   pointer-events: none;
   position: absolute;
   width: 100%;
   z-index: 1;
 }
 
+// Scroll parallax: the whole scene tracks the page at a slower rate, so the
+// hands linger in view while the clasp completes.
 .hands-depth {
   inset: 0;
   position: absolute;
-  transform-style: preserve-3d;
+  transform: translateY(var(--scroll-shift));
 }
 
+// Explicit size: SVGs are replaced elements, so with auto height the
+// intrinsic viewBox ratio would override the inset constraints and
+// misregister the artwork against the HTML spark/glow layers.
 .connection-lines,
 .hands-illustration {
+  height: 100%;
   inset: 0;
   position: absolute;
+  width: 100%;
 }
 
 // Pointer-driven parallax: each layer shifts by its own depth factor (--lx/--ly
@@ -412,72 +439,113 @@ textarea {
   left: 50%;
   opacity: calc(0.4 + var(--clasp) * 0.6);
   position: absolute;
-  top: 52%;
+  top: 56%;
   transform: translate(-50%, -50%) translate3d(calc(var(--px) * 14px), calc(var(--py) * 10px), 0);
   transition: opacity 240ms ease;
   width: 46%;
 }
 
-.hand-line {
-  fill: none;
+.hand-silhouette {
+  fill: var(--hand-fill);
   stroke: var(--hand-stroke);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.45;
+  stroke-width: 1.7;
 }
 
-.hand-line.soft {
-  opacity: 0.28;
-  stroke-width: 1;
+.hand-detail {
+  fill: none;
+  opacity: 0.55;
+  stroke: var(--hand-stroke);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.2;
 }
 
 .joint {
   fill: var(--joint-fill);
   stroke: var(--hand-stroke);
-  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.7;
 }
 
-.fingertip {
+.joint-inner {
+  fill: none;
+  opacity: 0.7;
+  stroke: var(--hand-stroke);
+  stroke-width: 1.2;
+}
+
+.rivet {
+  fill: var(--hand-stroke);
+  opacity: 0.6;
+}
+
+.status-light {
   fill: var(--clay);
-  opacity: calc(var(--clasp) * var(--clasp));
-  transition: opacity 200ms linear;
+  opacity: 0.55;
 }
 
 .human-hand,
 .robot-hand {
-  opacity: calc(0.58 + var(--clasp) * 0.42);
+  opacity: calc(0.62 + var(--clasp) * 0.38);
   transform-box: fill-box;
   transform-origin: center;
-  transition: opacity 120ms linear;
   will-change: transform;
 }
 
+// The artwork is drawn in the joined state. At --clasp: 0 the hands are
+// offset outward (apart); scrolling returns them to the drawn position while
+// the pointer adds depth (--lx/--ly, weighted per layer).
 .human-hand {
   transform: translate3d(
-      calc(var(--clasp) * 108px + var(--lx) * 30px),
-      calc(var(--clasp) * -8px + var(--ly) * 22px),
+      calc((var(--clasp) - 1) * 96px + var(--lx) * 26px),
+      calc((1 - var(--clasp)) * 14px + var(--ly) * 18px),
       0
     )
-    rotate(calc(var(--clasp) * -3deg));
+    rotate(calc((1 - var(--clasp)) * 2.5deg));
 }
 
 .robot-hand {
   transform: translate3d(
-      calc(var(--clasp) * -118px + var(--lx) * 34px),
-      calc(var(--clasp) * 8px + var(--ly) * 24px),
+      calc((1 - var(--clasp)) * 96px + var(--lx) * 32px),
+      calc((1 - var(--clasp)) * -12px + var(--ly) * 22px),
       0
     )
-    rotate(calc(var(--clasp) * 3deg));
+    rotate(calc((1 - var(--clasp)) * -2.5deg));
 }
 
-// Spark at the point where the fingertips meet; intensifies as hands clasp.
+// Idle float lives on nested groups so it composes with the parent's
+// var-driven transform instead of fighting it.
+.float {
+  animation: hand-float 7s ease-in-out infinite;
+}
+
+.float--offset {
+  animation-delay: -3.5s;
+}
+
+@keyframes hand-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+// Spark at the point where the fingertips meet. Opacity ramps with clasp^3 so
+// it only appears once the hands are truly close, then scales up to a pop.
 .connection-spark {
   height: 120px;
   left: 50%;
-  opacity: calc(var(--clasp) * var(--clasp));
+  opacity: calc(var(--clasp) * var(--clasp) * var(--clasp));
   position: absolute;
-  top: 58%;
-  transform: translate(-50%, -50%) translate3d(calc(var(--lx) * 46px), calc(var(--ly) * 30px), 0);
+  top: 57%;
+  transform: translate(-50%, -50%) translate3d(calc(var(--lx) * 46px), calc(var(--ly) * 30px), 0)
+    scale(calc(0.6 + var(--clasp) * 0.4));
   width: 120px;
 }
 
@@ -536,7 +604,7 @@ textarea {
 .focus-row {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
   margin-top: 28px;
 }
 
@@ -573,6 +641,10 @@ textarea {
   font-family: var(--display);
   font-size: 1.02rem;
   font-weight: 650;
+}
+
+.focus-card > span[aria-hidden='true'] {
+  white-space: nowrap;
 }
 
 .focus-card span {
@@ -674,7 +746,8 @@ textarea {
 .section-header {
   align-items: end;
   display: flex;
-  gap: 32px;
+  flex-wrap: wrap;
+  gap: 18px 32px;
   justify-content: space-between;
   margin-bottom: 26px;
 }
@@ -755,12 +828,65 @@ textarea {
   padding-left: 24px;
 }
 
+// Overflow protection for long-form content: code, tables, and long URLs
+// must never force horizontal page scroll.
+.prose {
+  overflow-wrap: break-word;
+}
+
+.prose pre {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 28px 0;
+  overflow-x: auto;
+  padding: 18px 20px;
+}
+
+.prose :not(pre) > code {
+  background: var(--paper-strong);
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  font-size: 0.92em;
+  padding: 1px 6px;
+}
+
+.prose table {
+  border-collapse: collapse;
+  display: block;
+  margin: 28px 0;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.prose th,
+.prose td {
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.98rem;
+  padding: 10px 14px;
+  text-align: left;
+}
+
+.prose th {
+  color: var(--ink);
+  font-family: var(--display);
+  font-weight: 600;
+}
+
+.prose img {
+  border-radius: var(--radius);
+  height: auto;
+}
+
 .about-grid,
 .values-grid,
 .research-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
 }
 
 .about-grid {
@@ -886,7 +1012,7 @@ textarea {
   align-items: start;
   display: grid;
   gap: 24px;
-  grid-template-columns: 1fr auto minmax(260px, 360px);
+  grid-template-columns: 1fr auto;
   margin: 0 auto;
   max-width: 1220px;
   padding: 34px 24px 28px;

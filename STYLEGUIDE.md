@@ -19,9 +19,12 @@ human/AI hand concept.
 
 - `SiteHeader.astro`: brand mark, primary navigation, and persisted light/dark
   mode toggle.
-- `HandsConnection.astro`: scroll-driven hero animation using inline SVG and one
-  small script.
-- `Footer.astro`: footer navigation, RSS link, and placeholder email signup.
+- `HandsConnection.astro`: hero animation. Inline SVG artwork is drawn in the
+  joined state; `--clasp` (0 -> 1, driven by scrollY over ~38vh) interpolates
+  the hands from apart to joined, `--scroll-shift` gives the scene slower
+  scroll parallax, and pointer movement shifts each `[data-parallax]` layer by
+  its `data-depth`. Reduced motion renders the static joined state.
+- `Footer.astro`: footer navigation, RSS link, and (newsletter signup removed until a real mailing list exists).
 - `PageLayout.astro`: shared layout for about, research, tag, and article pages.
 
 ## Rules
@@ -30,7 +33,17 @@ human/AI hand concept.
 - Keep cards at `8px` radius.
 - Prefer local assets in `public/` over external image URLs.
 - Keep research titles direct and readable.
-- Use placeholder copy only until real lab language, publications, and contact
-  details are ready.
+- Keep visible copy short, factual, and non-speculative; add claims only once
+  there is work to back them.
 - Dark mode should use `data-theme="dark"` tokens rather than one-off color
   overrides.
+
+## Launch state
+
+- The site is scoped to the lab's multi-agent evaluation and oversight focus.
+- The four template posts in `src/content/posts/` are marked `draft: true`, which
+  hides them from the research list, tags, and RSS. Remove the flag (or add real
+  posts) to bring publications back; `/research` shows a coming-soon state while
+  there are none.
+- The footer newsletter form and RSS link were removed; the form code is in git
+  history.

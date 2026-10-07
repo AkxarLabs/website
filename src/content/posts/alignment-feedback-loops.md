@@ -8,6 +8,7 @@ readTime: '6 Min Read'
 date: 2026-01-24
 cover: '/research-alignment.svg'
 featured: true
+draft: true
 tags: ['alignment', 'feedback', 'safety']
 ---
 

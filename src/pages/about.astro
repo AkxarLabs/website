@@ -1,60 +1,28 @@
 ---
 import PageLayout from '../layouts/PageLayout.astro';
+import { site } from '../lib/site';
 ---
 
 <PageLayout
-  title="A collaborative lab for AI safety."
-  eyebrow="About"
-  description="Akxar Labs is an open AI safety lab. We build clearer evidence around how advanced AI behaves — and we do it in the open, with collaborators."
+  title="About"
+  eyebrow="Akxar Labs"
+  description="An early-stage research lab studying how AI agents behave in open-ended, multi-agent settings."
 >
-  <section class="about-grid">
-    <div>
-      <div class="lab-stat">
-        <strong>03</strong>
-        <span>Research programs: alignment, evaluation, and human oversight.</span>
-      </div>
-      <div class="lab-stat" style="margin-top: 34px;">
-        <strong>Open</strong>
-        <span>Methods, tools, and results shared with the wider safety community.</span>
-      </div>
-      <div class="lab-stat" style="margin-top: 34px;">
-        <strong>2026</strong>
-        <span>Founded to make safety research a shared effort.</span>
-      </div>
-    </div>
-    <div class="prose">
-      <p>
-        We study the practical questions that sit between model capability and public benefit: when
-        systems reason well, when they fail, and how people can stay meaningfully in control.
-      </p>
-      <p>
-        We believe safety is a shared problem, so we work as a collaborative lab — publishing open
-        problems, inviting visiting researchers, and partnering with other teams on evaluations and
-        shared infrastructure.
-      </p>
-      <h2>How We Work</h2>
-      <p>
-        Our research combines empirical evaluation, prototype design, and public-facing explanation.
-        Outputs include papers, reproducibility reports, open-source tools, and field notes from
-        real deployments — all written so others can build on them.
-      </p>
-    </div>
-  </section>
-
-  <section class="section" style="padding-left: 0; padding-right: 0;">
-    <div class="values-grid">
-      <article class="value-card">
-        <h3>Evidence first</h3>
-        <p>Claims should be testable, reproducible, and honest about uncertainty.</p>
-      </article>
-      <article class="value-card">
-        <h3>Human agency</h3>
-        <p>AI systems should make people more capable without hiding judgment or tradeoffs.</p>
-      </article>
-      <article class="value-card">
-        <h3>Public clarity</h3>
-        <p>Research should be written so technical and nontechnical audiences can act on it.</p>
-      </article>
-    </div>
-  </section>
+  <div class="prose">
+    <p>
+      Standard evaluations tend to examine short trajectories of a single model. Open-ended
+      environments with many agents can reveal more: long-horizon coordination, mutual influence,
+      and strategies no one anticipated.
+    </p>
+    <p>
+      Akxar Labs designs scenarios that probe specific behavioral dispositions, builds monitoring
+      and oversight tooling for multi-agent systems, and aims to make the underlying environments
+      available as a shared resource for safety research.
+    </p>
+    <h2>Get in touch</h2>
+    <p>
+      We are at an early stage and welcome conversations with researchers and collaborators. Reach
+      us at <a class="text-link" href={`mailto:${site.email}`}>{site.email}</a>.
+    </p>
+  </div>
 </PageLayout>

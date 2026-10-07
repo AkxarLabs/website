@@ -8,14 +8,32 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
 );
 
 const fmt = (d: Date) =>
-  `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}.${d.getFullYear()}`;
+  `${String(d.getUTCMonth() + 1).padStart(2, '0')}.${String(d.getUTCDate()).padStart(2, '0')}.${d.getUTCFullYear()}`;
 ---
 
 <PageLayout
-  title="Research notes and essays."
-  eyebrow="Research"
-  description="A simple publication system for papers, lab notes, dataset releases, and longer-form thinking."
+  title="Research"
+  eyebrow="Akxar Labs"
+  description="Our work on scenario design and oversight for multi-agent AI systems. Publications will appear here."
 >
+  {
+    posts.length === 0 && (
+      <div class="values-grid">
+        <article class="value-card">
+          <h3>Scenario design</h3>
+          <p>Environments that probe cooperation, deception, and resource acquisition in agents.</p>
+        </article>
+        <article class="value-card">
+          <h3>Oversight and monitoring</h3>
+          <p>Tools for observing and steering multi-agent systems over long horizons.</p>
+        </article>
+        <article class="value-card">
+          <h3>Publications</h3>
+          <p>Coming soon.</p>
+        </article>
+      </div>
+    )
+  }
   <div class="research-grid">
     {
       posts.map((post) => (

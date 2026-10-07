@@ -10,9 +10,10 @@ interface Props {
   eyebrow?: string;
   heroImage?: string;
   pageTitle?: string;
+  compactTitle?: boolean;
 }
 
-const { title, description, eyebrow, heroImage, pageTitle } = Astro.props;
+const { title, description, eyebrow, heroImage, pageTitle, compactTitle = false } = Astro.props;
 const headTitle = pageTitle ?? `${title} — ${site.name}`;
 ---
 
@@ -31,7 +32,7 @@ const headTitle = pageTitle ?? `${title} — ${site.name}`;
 
       <section class="page-head">
         {eyebrow && <div class="page-eyebrow">{eyebrow}</div>}
-        <h1 class="page-title">{title}</h1>
+        <h1 class:list={['page-title', { 'page-title--compact': compactTitle }]}>{title}</h1>
         {description && <p class="page-deck">{description}</p>}
       </section>
 

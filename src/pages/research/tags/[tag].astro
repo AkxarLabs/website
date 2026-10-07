@@ -21,13 +21,14 @@ export async function getStaticPaths() {
 
 const { tag, posts } = Astro.props;
 const fmt = (d: Date) =>
-  `${String(d.getMonth() + 1).padStart(2, '0')}.${String(d.getDate()).padStart(2, '0')}.${d.getFullYear()}`;
+  `${String(d.getUTCMonth() + 1).padStart(2, '0')}.${String(d.getUTCDate()).padStart(2, '0')}.${d.getUTCFullYear()}`;
 ---
 
 <PageLayout
   title={`Research tagged ${tag}`}
   eyebrow="Tag"
   description={`${posts.length} research entr${posts.length === 1 ? 'y' : 'ies'} tagged ${tag}.`}
+  compactTitle
 >
   <p><a class="text-link" href={withBase('/research')}>All research</a></p>
   <div class="research-grid" style="margin-top: 28px;">

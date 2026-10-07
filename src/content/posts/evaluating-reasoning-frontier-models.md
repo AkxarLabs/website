@@ -8,6 +8,7 @@ readTime: '7 Min Read'
 date: 2026-02-12
 cover: '/research-reasoning.svg'
 featured: true
+draft: true
 tags: ['reasoning', 'evaluation', 'frontier-models']
 ---
 

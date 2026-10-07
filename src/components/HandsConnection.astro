@@ -7,64 +7,97 @@
       data-parallax
       data-depth="0.22"
       viewBox="0 0 1200 560"
+      preserveAspectRatio="xMidYMid slice"
       aria-hidden="true"
     >
-      <path d="M80 260c170-150 330-150 500 0s330 150 500 0"></path>
-      <path d="M140 340c170-100 300-100 480 30s320 100 470-50"></path>
-      <path d="M250 165c150-70 310-40 430 80s245 120 350 10"></path>
-      <circle cx="205" cy="390" r="4"></circle>
-      <circle cx="515" cy="205" r="5"></circle>
-      <circle cx="845" cy="165" r="5"></circle>
-      <circle cx="990" cy="358" r="4"></circle>
+      <path d="M120 250C280 140 440 160 596 292"></path>
+      <path d="M1080 240C920 130 760 160 606 290"></path>
+      <path d="M150 380C320 440 470 400 594 312"></path>
+      <path d="M1060 390C890 450 740 400 610 312"></path>
+      <circle cx="260" cy="196" r="4"></circle>
+      <circle cx="930" cy="180" r="4"></circle>
+      <circle cx="330" cy="416" r="4"></circle>
+      <circle cx="880" cy="424" r="4"></circle>
     </svg>
 
     <svg
       class="hands-illustration"
       viewBox="0 0 1200 560"
+      preserveAspectRatio="xMidYMid slice"
       role="img"
-      aria-label="A human hand and a robotic hand reaching toward each other and connecting"
+      aria-label="A human hand and a robotic hand reaching toward each other until they connect"
     >
-      <g class="robot-hand" data-robot-hand data-parallax data-depth="0.5">
-        <path
-          class="hand-line"
-          d="M1240 265c-111-15-224-24-330-1-67 15-122 40-174 77-36 25-69 42-108 54"></path>
-        <path class="hand-line" d="M960 262c-34-32-62-73-80-122-8-22-44-10-43 14 3 61 31 108 75 147"
-        ></path>
-        <path class="hand-line" d="M888 278c-28-47-43-98-42-152 1-23-38-22-47-1-23 55-3 112 35 163"
-        ></path>
-        <path class="hand-line" d="M815 312c-28-40-42-85-39-134 1-22-37-23-47-4-25 49-8 100 29 148"
-        ></path>
-        <path class="hand-line" d="M743 347c-31-25-55-59-70-99-8-20-42-8-42 14 0 49 31 89 76 123"
-        ></path>
-        <path class="hand-line" d="M1018 294c-48 8-94 24-139 48-35 19-69 31-103 39"></path>
-        <path class="hand-line soft" d="M1195 220c-83 8-163 26-241 55"></path>
-        <path class="hand-line soft" d="M1164 344c-124-11-230 4-319 49"></path>
-        <circle class="joint" cx="936" cy="262" r="16"></circle>
-        <circle class="joint" cx="856" cy="286" r="14"></circle>
-        <circle class="joint" cx="784" cy="322" r="13"></circle>
-        <circle class="joint" cx="712" cy="365" r="12"></circle>
-        <path class="hand-line" d="M1058 249l-33 80m84-87-24 78m-25 1 75 18"></path>
-        <circle class="fingertip fingertip--robot" cx="650" cy="395" r="6"></circle>
+      <g class="human-hand" data-parallax data-depth="0.78">
+        <g class="float">
+          <path
+            class="hand-silhouette"
+            d="M-20 262C90 252 200 248 296 256 342 260 372 263 400 266 434 269 462 275 490 283 520 291 548 297 568 301 577 303 583 306 586 310 590 316 586 321 579 320 570 319 559 316 548 312 528 305 508 300 492 299 501 304 516 311 530 319 539 324 546 330 548 336 549 342 544 345 537 341 525 334 511 326 498 321 504 327 513 335 520 343 525 349 527 355 523 359 518 363 511 359 505 352 496 342 487 334 479 329 483 335 488 342 491 349 493 355 490 359 485 357 478 354 471 346 465 338 452 322 438 314 422 310 430 320 440 333 446 346 450 356 448 364 440 363 430 361 418 349 408 336 397 322 385 313 370 308 344 300 316 298 288 302 204 312 100 330 -20 344Z"
+          ></path>
+          <g class="hand-detail">
+            <path d="M402 268c18 12 36 21 56 27"></path>
+            <path d="M356 262c12 14 24 26 40 36"></path>
+            <path d="M486 284c4 5 7 10 8 15"></path>
+            <path d="M298 256c-7 16-9 32-7 48"></path>
+            <path d="M314 257c-7 16-9 32-7 48"></path>
+          </g>
+        </g>
       </g>
 
-      <g class="human-hand" data-human-hand data-parallax data-depth="0.78">
-        <path
-          class="hand-line"
-          d="M-40 312c103-44 214-77 327-82 54-2 116 18 166 44 32 17 65 33 99 45 33 12 61 28 88 50"
-        ></path>
-        <path class="hand-line" d="M186 230c37 18 80 48 119 66 39 18 87 27 126 43"></path>
-        <path class="hand-line" d="M252 243c9-40 9-85-3-131-4-17 22-27 36-8 28 40 33 86 27 136"
-        ></path>
-        <path class="hand-line" d="M322 259c21-53 29-110 20-170-2-18 30-23 42-2 27 47 20 106 2 166"
-        ></path>
-        <path class="hand-line" d="M393 286c30-41 45-89 44-145 0-19 34-18 42 2 19 48 4 102-28 154"
-        ></path>
-        <path class="hand-line" d="M462 319c31-23 53-55 69-96 7-18 38-9 39 12 3 47-29 87-74 121"
-        ></path>
-        <path class="hand-line" d="M196 302c44 18 94 27 149 27 38 0 75 6 111 17"></path>
-        <path class="hand-line soft" d="M30 286c95-16 165-14 258 10"></path>
-        <path class="hand-line soft" d="M88 360c126-25 235-18 327 21"></path>
-        <circle class="fingertip fingertip--human" cx="548" cy="362" r="6"></circle>
+      <g class="robot-hand" data-parallax data-depth="0.5">
+        <g class="float float--offset">
+          <path
+            class="hand-silhouette"
+            d="M1220 250 1010 262c-20 2-34 10-40 22l-4 12c12 20 34 26 58 24l196 16"></path>
+          <path class="hand-detail" d="M1220 272 1040 280m180 34-174-8"></path>
+
+          <circle class="joint" cx="948" cy="294" r="22"></circle>
+          <circle class="joint-inner" cx="948" cy="294" r="8"></circle>
+
+          <path
+            class="hand-silhouette"
+            d="M938 272c-32-6-62-2-82 10-10 6-16 16-16 28 0 20 12 36 32 42 20 6 44 4 62-6 12-8 18-22 16-38-1-14-4-28-12-36Z"
+          ></path>
+          <path class="hand-detail" d="M862 286c-6 12-6 30 2 44"></path>
+          <circle class="rivet" cx="922" cy="288" r="2.6"></circle>
+          <circle class="rivet" cx="924" cy="336" r="2.6"></circle>
+
+          <circle class="joint" cx="842" cy="303" r="9"></circle>
+          <rect class="hand-silhouette" x="762" y="292" width="72" height="22" rx="11"></rect>
+          <circle class="joint" cx="754" cy="303" r="8"></circle>
+          <rect class="hand-silhouette" x="686" y="294" width="62" height="20" rx="10"></rect>
+          <circle class="joint" cx="680" cy="304" r="7"></circle>
+          <path class="hand-silhouette" d="M674 297 648 297c-14 0-24 5-24 10 0 5 10 9 24 9l26-3Z"
+          ></path>
+          <circle class="status-light" cx="898" cy="312" r="4"></circle>
+
+          <circle class="joint" cx="848" cy="324" r="8"></circle>
+          <g transform="rotate(-16 848 324)">
+            <rect class="hand-silhouette" x="784" y="315.5" width="62" height="17" rx="8.5"></rect>
+          </g>
+          <circle class="joint" cx="786" cy="342" r="6.5"></circle>
+          <g transform="rotate(-30 786 342)">
+            <rect class="hand-silhouette" x="736" y="334" width="50" height="16" rx="8"></rect>
+          </g>
+
+          <circle class="joint" cx="854" cy="344" r="7"></circle>
+          <g transform="rotate(-22 854 344)">
+            <rect class="hand-silhouette" x="796" y="336" width="58" height="16" rx="8"></rect>
+          </g>
+          <circle class="joint" cx="800" cy="366" r="6"></circle>
+          <g transform="rotate(-36 800 366)">
+            <rect class="hand-silhouette" x="756" y="358.5" width="44" height="15" rx="7.5"></rect>
+          </g>
+
+          <circle class="joint" cx="860" cy="360" r="6"></circle>
+          <g transform="rotate(-28 860 360)">
+            <rect class="hand-silhouette" x="814" y="353" width="46" height="14" rx="7"></rect>
+          </g>
+
+          <circle class="joint" cx="886" cy="362" r="8"></circle>
+          <g transform="rotate(-48 886 362)">
+            <rect class="hand-silhouette" x="830" y="353" width="56" height="18" rx="9"></rect>
+          </g>
+        </g>
       </g>
     </svg>
 
@@ -82,21 +115,40 @@
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
 
   if (scene) {
-    // Scroll drives the "clasp": how far the two hands have closed the gap.
-    const updateClasp = () => {
-      const rect = scene.getBoundingClientRect();
+    const smoothstep = (x: number) => x * x * (3 - 2 * x);
+
+    // Scroll drives the clasp: hands rest apart at the top of the page and
+    // join between 10vh and 60vh of scrolling — timed so the hero copy and
+    // buttons have scrolled past the meeting point before the hands touch.
+    // The scene itself tracks the scroll at a slower rate so the join stays
+    // in view (scroll parallax).
+    const hero = scene.closest<HTMLElement>('.hero');
+
+    const updateScroll = () => {
+      if (reduceMotion.matches) {
+        scene.style.setProperty('--clasp', '1');
+        scene.style.setProperty('--scroll-shift', '0px');
+        hero?.style.setProperty('--clasp', '1');
+        return;
+      }
       const viewport = window.innerHeight || 1;
-      const raw = (viewport * 0.82 - rect.top) / (viewport * 0.85);
-      const progress = Math.min(1, Math.max(0, raw));
-      scene.style.setProperty('--clasp', progress.toFixed(3));
+      const start = viewport * 0.1;
+      const end = viewport * 0.65;
+      const raw = Math.min(1, Math.max(0, (window.scrollY - start) / (end - start)));
+      const clasp = smoothstep(raw).toFixed(3);
+      scene.style.setProperty('--clasp', clasp);
+      scene.style.setProperty('--scroll-shift', `${(window.scrollY * 0.44).toFixed(1)}px`);
+      // The hero also carries --clasp so page-level elements (scroll cue)
+      // can react to the join.
+      hero?.style.setProperty('--clasp', clasp);
     };
 
-    updateClasp();
-    document.addEventListener('scroll', updateClasp, { passive: true });
-    window.addEventListener('resize', updateClasp);
+    updateScroll();
+    document.addEventListener('scroll', updateScroll, { passive: true });
+    window.addEventListener('resize', updateScroll);
 
     // Pointer drives parallax depth. Each layer shifts in proportion to its
-    // data-depth, and we lerp toward the target for a smooth, weighted feel.
+    // data-depth; we lerp toward the target so the motion feels weighted.
     let targetX = 0;
     let targetY = 0;
     let currentX = 0;
@@ -104,8 +156,8 @@
     let rafId = 0;
 
     const applyParallax = () => {
-      currentX += (targetX - currentX) * 0.07;
-      currentY += (targetY - currentY) * 0.07;
+      currentX += (targetX - currentX) * 0.08;
+      currentY += (targetY - currentY) * 0.08;
       scene.style.setProperty('--px', currentX.toFixed(4));
       scene.style.setProperty('--py', currentY.toFixed(4));
       for (const layer of layers) {
@@ -142,6 +194,7 @@
 
     enableParallax();
     reduceMotion.addEventListener('change', (event) => {
+      updateScroll();
       if (event.matches) disableParallax();
       else enableParallax();
     });
