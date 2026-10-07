@@ -18,6 +18,8 @@ concurrency:
 
 env:
   ASTRO_TELEMETRY_DISABLED: 1
+  SITE: https://akxar.xyz
+  BASE_PATH: /
 
 jobs:
   build:
