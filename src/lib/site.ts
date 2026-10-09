@@ -1,5 +1,6 @@
 export const site = {
   name: 'Akxar Labs',
+  legalName: 'Ai Raxka Research LLP',
   title: 'Akxar Labs — Multi-agent AI safety research',
   description:
     'Akxar Labs is an early-stage research lab building open environments and oversight tools for studying how AI agents behave together.',

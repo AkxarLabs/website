@@ -1,8 +1,8 @@
 ---
-title: "Newts' Lab: oversight for automated research"
+title: "Newts' Lab: studying automated research"
 shortTitle: "Newts' Lab"
-headline: "Newts' Lab: oversight for automated research"
-excerpt: 'An open research lab run by AI agents with explicit human gates, built to study how automated research can be overseen.'
+headline: "Newts' Lab: a testbed for overseeing automated research"
+excerpt: 'A customizable lab where an AI agent runs research from idea to paper under human gates, built for studying how such systems should be overseen.'
 author: 'Akxar Labs'
 readTime: '3 Min Read'
 date: 2026-10-08
@@ -13,25 +13,24 @@ repo: 'https://github.com/AkxarLabs/newts-lab'
 repoLabel: "Newts' Lab on GitHub"
 ---
 
-AI agents can now carry out much of the research process. Our second release is a lab for studying that, with oversight built in.
+This is a short release and position note, not a results paper.
 
-## Why this matters
+## Background
 
-Automated research systems are being pointed at AI safety itself. If an agent proposes the experiments, runs them, and writes the conclusions, then its mistakes, shortcuts, and reward hacking can end up in the results we rely on to judge other systems.
+Automated research systems can now take on much of the research process, from generating ideas to writing papers. They are increasingly pointed at AI safety research itself.
 
-We think this makes automated research an object of study in its own right. The mechanisms for studying it need to exist before it is widely relied on, not after.
+## The argument
 
-## What Newts' Lab does
+When an agent proposes experiments, runs them and writes up the conclusions, its mistakes and shortcuts can carry into results that people then use to judge other AI systems. We need better ways to study these systems: what they do when no one is watching, where they cut corners, and which checks actually catch it.
 
-Newts' Lab is a self-contained lab for an AI agent. It takes a direction through ideation, literature review, proposal, experiments, analysis, writing, and internal review. The structure is designed to make each step inspectable:
+That requires a setting where automated research runs with visible structure rather than as a black box. There is also no reason to expect one oversight design to be right, so the setting should be easy to change.
 
-- **Human gates.** A person approves the proposal, the full-scale runs, and the final paper. Agents cannot sign off on their own work.
-- **Kill criteria up front.** Every proposal states, before any experiment, what result would end the project.
-- **Claims tied to evidence.** A mechanical audit checks that each claim in a draft links to a run, and independent reviewers critique the paper with fresh context.
-- **One dashboard.** Every agent and subagent, every question, and every document are visible in one place.
+## Newts' Lab
 
-![A human gate in Newts' Lab: the person sees what they are approving, and the checks that passed, before work continues. Demo data.](/research/newts-lab-gate.jpg)
+Newts' Lab is an open lab in which an agent carries a research direction from idea to paper. A person approves it at three gates, each proposal states in advance what result would end the project, and a mechanical audit checks that claims in a draft link back to runs.
 
-## Our position
+The rest is meant to be modified. Stages, procedures, subagent roles, rules and checks are defined in files and can be edited from the dashboard. Only the gates and the safety rules are fixed. The lab can run manually, one stage at a time, or unattended under an approved brief, which makes it possible to compare how much oversight each level of autonomy needs.
 
-Autonomy can be raised in steps, from manual to a fully unattended campaign, while the gates and audit trail stay the same. That makes it possible to ask how much oversight a given level of autonomy needs, and where the existing checks fail. Newts' Lab is the testbed for those questions, and it is open for others to run and extend.
+![A human gate in Newts' Lab: the person sees what they are approving and which checks passed before work continues. Demo data.](/research/newts-lab-gate.jpg)
+
+We are releasing it early for others to run, change and test.
