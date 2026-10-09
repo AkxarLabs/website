@@ -15,6 +15,8 @@ const posts = defineCollection({
     featured: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
     draft: z.boolean().default(false),
+    repo: z.string().url().optional(),
+    repoLabel: z.string().optional(),
   }),
 });
 

@@ -9,7 +9,10 @@ import { site, withBase } from '../lib/site';
 const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort(
   (a, b) => +b.data.date - +a.data.date,
 );
-const featured = posts.find((post) => post.data.featured) ?? posts[0];
+const featuredPosts = posts.filter((post) => post.data.featured).slice(0, 2);
+
+const fmt = (d: Date) =>
+  `${String(d.getUTCMonth() + 1).padStart(2, '0')}.${String(d.getUTCDate()).padStart(2, '0')}.${d.getUTCFullYear()}`;
 ---
 
 <BaseLayout>
@@ -99,17 +102,32 @@ const featured = posts.find((post) => post.data.featured) ?? posts[0];
       </div>
 
       {
-        featured && (
-          <section class="featured-research" aria-labelledby="featured-title">
-            <div class="featured-copy">
-              <p class="kicker">Featured research</p>
-              <h2 id="featured-title">{featured.data.headline}</h2>
-              <p>{featured.data.excerpt}</p>
-              <a class="text-link" href={withBase(`/research/${featured.id}`)}>
-                Read the research
+        featuredPosts.length > 0 && (
+          <section class="section featured-section" aria-labelledby="featured-title">
+            <div class="section-header">
+              <div>
+                <p class="kicker">Featured research</p>
+                <h2 id="featured-title">Our first releases.</h2>
+              </div>
+              <a class="text-link" href={withBase('/research')}>
+                All research
               </a>
             </div>
-            <div class="research-visual" aria-hidden="true" />
+            <div class="research-grid research-grid--featured">
+              {featuredPosts.map((post) => (
+                <a class="research-card" href={withBase(`/research/${post.id}`)}>
+                  <div class="research-card__cover">
+                    <img src={withBase(post.data.cover)} alt="" loading="lazy" />
+                  </div>
+                  <div class="research-card__meta">
+                    <span>{fmt(post.data.date)}</span>
+                    <span>{post.data.readTime}</span>
+                  </div>
+                  <h3>{post.data.headline}</h3>
+                  <p>{post.data.excerpt}</p>
+                </a>
+              ))}
+            </div>
           </section>
         )
       }

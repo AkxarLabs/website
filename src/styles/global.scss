@@ -773,6 +773,7 @@ textarea {
 .page-hero img {
   height: 100%;
   object-fit: cover;
+  object-position: top left;
   width: 100%;
 }
 
@@ -916,7 +917,8 @@ textarea {
 }
 
 .value-card h3,
-.research-card h2 {
+.research-card h2,
+.research-card h3 {
   font-family: var(--display);
   font-size: 1.25rem;
   font-weight: 600;
@@ -950,6 +952,7 @@ textarea {
 .research-card__cover img {
   height: 100%;
   object-fit: cover;
+  object-position: top left;
   width: 100%;
 }
 
@@ -1225,4 +1228,25 @@ textarea {
   .newsletter-form button {
     min-height: 44px;
   }
+}
+
+.research-grid--featured {
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.featured-section {
+  padding-bottom: 0;
+}
+
+.prose .post-repo {
+  margin-top: 36px;
+}
+
+.prose figure,
+.prose p > img {
+  margin: 28px 0;
+}
+
+.prose img {
+  border: 1px solid var(--line);
 }

@@ -51,6 +51,15 @@ const fmt = (d: Date) =>
 
   <div class="prose">
     <Content />
+    {
+      post.data.repo && (
+        <p class="post-repo">
+          <a href={post.data.repo} rel="noopener">
+            {post.data.repoLabel ?? 'View on GitHub'} ↗
+          </a>
+        </p>
+      )
+    }
   </div>
 
   <nav class="post-nav" aria-label="Adjacent research posts">
