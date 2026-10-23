@@ -1,38 +1,79 @@
-<div class="hands-scene" data-hands-scene>
+---
+import { withBase } from '../lib/site';
+---
+
+<div class="hands-scene" data-hands-scene data-model={withBase('/models/hands.glb')}>
   <div class="hands-depth">
     <div class="hands-glow" aria-hidden="true"></div>
 
-    <svg
-      class="connection-lines"
-      data-parallax
-      data-depth="0.22"
-      viewBox="0 0 1000 560"
-      preserveAspectRatio="none"
-      aria-hidden="true"
-    >
-      <path d="M0 90C180 50 360 200 496 298"></path>
-      <path d="M1000 90C820 50 640 200 504 298"></path>
-      <path d="M0 210C200 180 340 262 496 302"></path>
-      <path d="M1000 210C800 180 660 262 504 302"></path>
-      <path d="M0 330C200 370 360 340 496 308"></path>
-      <path d="M1000 330C800 370 640 340 504 308"></path>
-      <path d="M0 450C160 530 360 420 496 312"></path>
-      <path d="M1000 450C840 530 640 420 504 312"></path>
-      <path d="M0 560C220 500 390 410 498 316"></path>
-      <path d="M1000 560C780 500 610 410 502 316"></path>
-      <path d="M330 560C390 470 450 390 499 318"></path>
-      <path d="M670 560C610 470 550 390 501 318"></path>
-    </svg>
+    <div class="connection-orbit connection-orbit--outer" aria-hidden="true"></div>
+    <div class="connection-orbit connection-orbit--inner" aria-hidden="true"></div>
 
+    <div
+      class="hands-webgl"
+      data-hands-webgl
+      aria-hidden="true"
+      role="img"
+      aria-label="Three-dimensional human and robotic hands, drawn with sculpted surfaces, ink contours, and mesh vertices, reaching diagonally toward each other"
+    >
+    </div>
     <svg
-      class="hands-illustration"
+      class="hands-illustration hands-fallback"
       viewBox="0 0 1200 560"
       preserveAspectRatio="xMidYMid meet"
       role="img"
       aria-label="A human hand and a robotic hand reaching toward each other until they connect"
     >
-      <g class="human-hand" data-parallax data-depth="0.78">
-        <g class="float">
+      <defs>
+        <linearGradient
+          id="human-material"
+          x1="0"
+          y1="250"
+          x2="0"
+          y2="365"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop offset="0" stop-color="#b98061"></stop>
+          <stop offset="0.22" stop-color="#e4b395"></stop>
+          <stop offset="0.42" stop-color="#f7d7b9"></stop>
+          <stop offset="0.62" stop-color="#deb092"></stop>
+          <stop offset="0.84" stop-color="#b77d5c"></stop>
+          <stop offset="1" stop-color="#805039"></stop>
+        </linearGradient>
+        <linearGradient id="robot-material" x1="0.15" y1="0" x2="0.4" y2="1">
+          <stop offset="0" stop-color="#74868e"></stop>
+          <stop offset="0.18" stop-color="#e1e9e9"></stop>
+          <stop offset="0.38" stop-color="#fcfdf9"></stop>
+          <stop offset="0.52" stop-color="#bbc9cb"></stop>
+          <stop offset="0.8" stop-color="#75888f"></stop>
+          <stop offset="1" stop-color="#394f59"></stop>
+        </linearGradient>
+        <radialGradient id="joint-material" cx="35%" cy="25%" r="75%">
+          <stop offset="0" stop-color="#b4c2c7"></stop>
+          <stop offset="0.45" stop-color="#5b707a"></stop>
+          <stop offset="0.75" stop-color="#293e48"></stop>
+          <stop offset="1" stop-color="#122832"></stop>
+        </radialGradient>
+        <linearGradient id="nail-material" x1="0" y1="0" x2="0.2" y2="1">
+          <stop offset="0" stop-color="#fff0de"></stop>
+          <stop offset="1" stop-color="#d8a98d"></stop>
+        </linearGradient>
+        <filter
+          id="hand-shadow"
+          x="-15%"
+          y="-80%"
+          width="130%"
+          height="280%"
+          color-interpolation-filters="sRGB"
+        >
+          <feDropShadow dx="0" dy="18" stdDeviation="13" flood-color="#34271e" flood-opacity="0.18"
+          ></feDropShadow>
+          <feDropShadow dx="0" dy="2" stdDeviation="1.2" flood-color="#34271e" flood-opacity="0.2"
+          ></feDropShadow>
+        </filter>
+      </defs>
+      <g class="human-hand">
+        <g transform="translate(14 0)" filter="url(#hand-shadow)">
           <path
             class="hand-silhouette"
             d="M-1600 272C-900 268 -400 268 -20 262C90 252 200 248 296 256 342 260 372 263 400 266 434 269 462 275 490 283 520 291 548 297 568 301 577 303 583 306 586 310 590 316 586 321 579 320 570 319 559 316 548 312 528 305 508 300 492 299 501 304 516 311 530 319 539 324 546 330 548 336 549 342 544 345 537 341 525 334 511 326 498 321 504 327 513 335 520 343 525 349 527 355 523 359 518 363 511 359 505 352 496 342 487 334 479 329 483 335 488 342 491 349 493 355 490 359 485 357 478 354 471 346 465 338 452 322 438 314 422 310 430 320 440 333 446 346 450 356 448 364 440 363 430 361 418 349 408 336 397 322 385 313 370 308 344 300 316 298 288 302 204 312 100 330 -20 344C-400 356 -900 360 -1600 358Z"
@@ -43,12 +84,22 @@
             <path d="M486 284c4 5 7 10 8 15"></path>
             <path d="M298 256c-7 16-9 32-7 48"></path>
             <path d="M314 257c-7 16-9 32-7 48"></path>
+            <path d="M322 280c40-4 64 1 91 13"></path>
+            <path d="M426 288c24 8 42 13 61 14"></path>
+            <path d="M462 306c12 5 22 11 31 17"></path>
+            <path d="M516 294l-3 8m33 0-2 8m-38 14-4 5"></path>
           </g>
+          <path class="hand-highlight" d="M-20 274C130 260 236 260 296 267c72 3 120 9 174 25"
+          ></path>
+          <path
+            class="hand-highlight hand-highlight--fine"
+            d="M431 304c-16-5-33-9-49-10M502 289l44 12"></path>
+          <path class="human-nail" d="M565 302c9 1 15 4 18 8-4 2-10 0-18-2Z"></path>
         </g>
       </g>
 
-      <g class="robot-hand" data-parallax data-depth="0.5">
-        <g class="float float--offset">
+      <g class="robot-hand">
+        <g transform="translate(-24 3)" filter="url(#hand-shadow)">
           <path
             class="hand-silhouette"
             d="M2600 230 1220 250 1010 262c-20 2-34 10-40 22l-4 12c12 20 34 26 58 24l196 16L2600 356"
@@ -74,7 +125,11 @@
           <circle class="joint" cx="680" cy="304" r="7"></circle>
           <path class="hand-silhouette" d="M674 297 648 297c-14 0-24 5-24 10 0 5 10 9 24 9l26-3Z"
           ></path>
-          <circle class="status-light" cx="898" cy="312" r="4"></circle>
+          <path class="robot-inlay" d="M878 288c14-5 28-5 43-1l5 32c-13 8-28 11-43 7Z"></path>
+          <path class="robot-trace" d="M888 297h20l6 7v12m-26-10h12v12"></path>
+          <path class="robot-highlight" d="M1034 270l175-11M774 297h47M695 299h41M635 303h27"
+          ></path>
+          <circle class="status-light" cx="898" cy="312" r="3"></circle>
 
           <circle class="joint" cx="848" cy="324" r="8"></circle>
           <g transform="rotate(-16 848 324)">
@@ -107,102 +162,36 @@
       </g>
     </svg>
 
-    <div class="connection-spark" data-parallax data-depth="1.05" aria-hidden="true">
+    <div class="connection-spark" aria-hidden="true">
       <span class="spark-core"></span>
       <span class="spark-ring"></span>
       <span class="spark-ring spark-ring--delayed"></span>
     </div>
   </div>
+  <div class="scene-caption" aria-hidden="true">
+    <span class="scene-caption__label">Human intuition</span>
+    <span class="scene-caption__center"
+      ><span></span> <span data-connection-label>In connection</span></span
+    >
+    <span class="scene-caption__label">Machine intelligence</span>
+  </div>
 </div>
 
 <script>
   const scene = document.querySelector<HTMLElement>('[data-hands-scene]');
-  const layers = Array.from(document.querySelectorAll<HTMLElement>('[data-parallax]'));
-  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-
   if (scene) {
-    const smoothstep = (x: number) => x * x * (3 - 2 * x);
-
-    // Scroll drives the clasp: hands rest apart at the top of the page and
-    // join between 10vh and 60vh of scrolling — timed so the hero copy and
-    // buttons have scrolled past the meeting point before the hands touch.
-    // The scene itself tracks the scroll at a slower rate so the join stays
-    // in view (scroll parallax).
-    const hero = scene.closest<HTMLElement>('.hero');
-
-    const updateScroll = () => {
-      if (reduceMotion.matches) {
-        scene.style.setProperty('--clasp', '1');
-        scene.style.setProperty('--scroll-shift', '0px');
-        hero?.style.setProperty('--clasp', '1');
-        return;
-      }
-      const viewport = window.innerHeight || 1;
-      const start = viewport * 0.1;
-      const end = viewport * 0.65;
-      const raw = Math.min(1, Math.max(0, (window.scrollY - start) / (end - start)));
-      const clasp = smoothstep(raw).toFixed(3);
-      scene.style.setProperty('--clasp', clasp);
-      scene.style.setProperty('--scroll-shift', `${(window.scrollY * 0.44).toFixed(1)}px`);
-      // The hero also carries --clasp so page-level elements (scroll cue)
-      // can react to the join.
-      hero?.style.setProperty('--clasp', clasp);
-    };
-
-    updateScroll();
-    document.addEventListener('scroll', updateScroll, { passive: true });
-    window.addEventListener('resize', updateScroll);
-
-    // Pointer drives parallax depth. Each layer shifts in proportion to its
-    // data-depth; we lerp toward the target so the motion feels weighted.
-    let targetX = 0;
-    let targetY = 0;
-    let currentX = 0;
-    let currentY = 0;
-    let rafId = 0;
-
-    const applyParallax = () => {
-      currentX += (targetX - currentX) * 0.08;
-      currentY += (targetY - currentY) * 0.08;
-      scene.style.setProperty('--px', currentX.toFixed(4));
-      scene.style.setProperty('--py', currentY.toFixed(4));
-      for (const layer of layers) {
-        const depth = Number(layer.dataset.depth || '0.5');
-        layer.style.setProperty('--lx', (currentX * depth).toFixed(4));
-        layer.style.setProperty('--ly', (currentY * depth).toFixed(4));
-      }
-      if (Math.abs(targetX - currentX) > 0.001 || Math.abs(targetY - currentY) > 0.001) {
-        rafId = requestAnimationFrame(applyParallax);
-      } else {
-        rafId = 0;
-      }
-    };
-
-    const onPointerMove = (event: PointerEvent) => {
-      const rect = scene.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      targetX = Math.max(-1, Math.min(1, (event.clientX - cx) / (rect.width / 2 || 1)));
-      targetY = Math.max(-1, Math.min(1, (event.clientY - cy) / (rect.height / 2 || 1)));
-      if (!rafId) rafId = requestAnimationFrame(applyParallax);
-    };
-
-    const enableParallax = () => {
-      if (reduceMotion.matches) return;
-      window.addEventListener('pointermove', onPointerMove, { passive: true });
-    };
-    const disableParallax = () => {
-      window.removeEventListener('pointermove', onPointerMove);
-      targetX = 0;
-      targetY = 0;
-      if (!rafId) rafId = requestAnimationFrame(applyParallax);
-    };
-
-    enableParallax();
-    reduceMotion.addEventListener('change', (event) => {
-      updateScroll();
-      if (event.matches) disableParallax();
-      else enableParallax();
-    });
+    // Keep the renderer out of the critical page bundle. The static illustration
+    // remains visible until a complete WebGL frame has rendered successfully.
+    const load = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        load.disconnect();
+        import('../lib/hands-scene')
+          .then(({ mountHandsScene }) => mountHandsScene(scene))
+          .catch(() => {});
+      },
+      { rootMargin: '240px' },
+    );
+    load.observe(scene);
   }
 </script>

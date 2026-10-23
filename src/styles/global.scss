@@ -16,9 +16,10 @@
   --grid-line-y: rgba(17, 19, 20, 0.025);
   --button-solid-bg: #050607;
   --button-solid-text: #fffaf3;
-  --hand-stroke: #9a806b;
-  --hand-fill: rgba(154, 128, 107, 0.05);
-  --joint-fill: rgba(247, 242, 234, 0.88);
+  --hand-outline: #a47356;
+  --robot-outline: #647982;
+  --scene-halo: rgba(191, 151, 102, 0.16);
+  --scene-shadow: rgba(99, 76, 49, 0.14);
   --visual-sphere: rgba(247, 250, 243, 0.88);
   --visual-ring: rgba(17, 19, 20, 0.16);
   --visual-gradient: linear-gradient(150deg, rgba(83, 107, 124, 0.18), rgba(169, 121, 85, 0.12));
@@ -48,9 +49,10 @@
   --grid-line-y: rgba(241, 236, 227, 0.026);
   --button-solid-bg: #f1ece3;
   --button-solid-text: #11110f;
-  --hand-stroke: #c49a78;
-  --hand-fill: rgba(196, 154, 120, 0.07);
-  --joint-fill: rgba(26, 24, 21, 0.9);
+  --hand-outline: #bb8969;
+  --robot-outline: #8b9da4;
+  --scene-halo: rgba(191, 151, 102, 0.12);
+  --scene-shadow: rgba(0, 0, 0, 0.35);
   --visual-sphere: rgba(241, 236, 227, 0.16);
   --visual-ring: rgba(241, 236, 227, 0.16);
   --visual-gradient: linear-gradient(150deg, rgba(83, 107, 124, 0.32), rgba(208, 161, 118, 0.16));
@@ -238,17 +240,16 @@ textarea {
 .hero {
   margin: 0 auto;
   max-width: 1420px;
-  min-height: calc(100vh - 92px);
-  overflow-x: visible;
-  overflow-y: clip;
+  overflow: visible;
   padding: 26px 24px 0;
+  isolation: isolate;
   position: relative;
 }
 
 .hero-copy {
   margin: 0 auto;
   max-width: 720px;
-  padding-top: clamp(54px, 11vh, 128px);
+  padding-top: clamp(36px, 6vh, 72px);
   position: relative;
   text-align: center;
   z-index: 2;
@@ -325,6 +326,22 @@ textarea {
   min-height: 52px;
   padding: 0 24px;
   text-decoration: none;
+  box-shadow: 0 2px 3px rgba(17, 19, 20, 0.04);
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 7px 18px var(--scene-shadow);
+}
+
+.button:focus-visible,
+a:focus-visible,
+button:focus-visible {
+  outline: 2px solid var(--clay);
+  outline-offset: 5px;
 }
 
 .button--dark {
@@ -341,21 +358,22 @@ textarea {
   align-items: center;
   color: var(--soft);
   display: flex;
-  font-size: 0.9rem;
-  gap: 12px;
+  font-size: 0.72rem;
+  gap: 10px;
   justify-content: center;
-  margin-top: clamp(32px, 6vh, 70px);
+  letter-spacing: 0.06em;
+  margin-top: 26px;
   // Fade out as the hands join — the cue has served its purpose and would
   // otherwise sit right on the meeting point.
-  opacity: calc(1 - var(--clasp, 0));
+  opacity: calc(1 - var(--clasp, 1));
 }
 
 .scroll-cue span:first-child {
   border: 1px solid var(--soft);
   border-radius: 999px;
-  height: 34px;
+  height: 26px;
   position: relative;
-  width: 22px;
+  width: 17px;
 }
 
 .scroll-cue span:first-child::after {
@@ -371,221 +389,232 @@ textarea {
 }
 
 .hands-scene {
-  --clasp: 0;
+  // Without JavaScript the illustration rests in the connected state.
+  --clasp: 1;
   --px: 0;
   --py: 0;
-  --scroll-shift: 0px;
-  // The artwork keeps its proportions; the arms and flow lines run past it to
-  // the viewport edges so the hands appear to enter from the screen boundary.
-  --art-w: clamp(640px, 100vw, 1200px);
-  height: calc(var(--art-w) * 0.4667);
+  --art-w: clamp(600px, 96vw, 1200px);
+  height: calc(var(--art-w) * 0.38 + 68px);
   left: 50%;
   margin-left: -50vw;
+  margin-top: -8px;
   pointer-events: none;
-  position: absolute;
-  top: clamp(86px, 12vh, 140px);
+  position: relative;
   width: 100vw;
-  z-index: 1;
 }
 
-// Scroll parallax: the whole scene tracks the page at a slower rate, so the
-// hands linger in view while the clasp completes.
 .hands-depth {
-  inset: 0;
   position: absolute;
-  transform: translateY(var(--scroll-shift));
+  inset: 0 0 36px;
+  transform: translate3d(calc(var(--px) * 9px), calc(var(--py) * 7px), 0);
 }
 
-// Explicit size: SVGs are replaced elements, so with auto height the
-// intrinsic viewBox ratio would override the inset constraints and
-// misregister the artwork against the HTML spark/glow layers.
-.connection-lines {
-  height: 100%;
-  inset: 0;
+.hands-webgl {
   position: absolute;
+  inset: -100px 0 -50px;
+}
+
+.hands-webgl canvas {
+  display: block;
+  height: 100%;
   width: 100%;
 }
 
-.hands-illustration {
-  aspect-ratio: 1200 / 560;
-  left: 50%;
-  margin-left: calc(var(--art-w) / -2);
-  overflow: visible;
-  position: absolute;
-  top: 0;
-  width: var(--art-w);
-}
+.has-webgl {
+  .hands-fallback,
+  .connection-orbit,
+  .connection-spark {
+    visibility: hidden;
+  }
 
-// Pointer-driven parallax: each layer shifts by its own depth factor (--lx/--ly
-// are computed per-layer in the component script from data-depth).
-[data-parallax] {
-  --lx: 0;
-  --ly: 0;
-  will-change: transform;
-}
-
-.connection-lines[data-parallax] {
-  transform: translate3d(calc(var(--lx) * 40px), calc(var(--ly) * 26px), 0);
-}
-
-.connection-lines path {
-  animation: signal-flow 5s linear infinite;
-  fill: none;
-  opacity: calc(0.24 + var(--clasp) * 0.34);
-  stroke: var(--clay);
-  stroke-dasharray: 2 10;
-  stroke-linecap: round;
-  stroke-width: 1.3;
-  transition: opacity 200ms linear;
-  vector-effect: non-scaling-stroke;
-}
-
-.connection-lines path:nth-child(even) {
-  animation-duration: 7s;
-}
-
-// Dashes travel along each path, from the screen edge toward the meeting
-// point. 60 = five dash periods, so the loop is seamless.
-@keyframes signal-flow {
-  to {
-    stroke-dashoffset: -60;
+  .hands-depth::after {
+    display: none;
   }
 }
 
-.hands-glow {
-  background: radial-gradient(
-    closest-side,
-    rgba(169, 121, 85, calc(0.16 + var(--clasp) * 0.22)),
-    transparent 72%
-  );
-  height: 80%;
-  left: 50%;
-  opacity: calc(0.4 + var(--clasp) * 0.6);
+.hands-depth::after {
+  background: radial-gradient(ellipse, var(--scene-shadow), transparent 68%);
+  content: '';
   position: absolute;
-  top: 56%;
-  transform: translate(-50%, -50%) translate3d(calc(var(--px) * 14px), calc(var(--py) * 10px), 0);
-  transition: opacity 240ms ease;
-  width: 56%;
+  width: min(68%, 760px);
+  height: 18%;
+  left: 50%;
+  top: 78%;
+  opacity: 0.65;
+  transform: translateX(-50%) scaleX(calc(0.85 + var(--clasp) * 0.15));
+  z-index: -1;
+}
+
+.hands-illustration {
+  display: block;
+  height: auto;
+  max-width: none;
+  left: 50%;
+  overflow: visible;
+  position: absolute;
+  top: -38px;
+  transform: translateX(-50%);
+  width: var(--art-w);
+}
+
+.hands-glow {
+  background: radial-gradient(ellipse, var(--scene-halo), transparent 68%);
+  height: 130%;
+  left: 50%;
+  position: absolute;
+  top: 48%;
+  transform: translate(-50%, -50%);
+  width: min(90%, 1000px);
+}
+
+.connection-orbit {
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  height: calc(var(--art-w) * 0.25);
+  left: 50%;
+  opacity: 0.28;
+  position: absolute;
+  top: calc(var(--art-w) * 0.2583 - 38px);
+  transform: translate(-50%, -50%) rotate(-24deg) scaleY(0.65);
+  width: calc(var(--art-w) * 0.47);
+}
+
+.connection-orbit--inner {
+  height: calc(var(--art-w) * 0.19);
+  opacity: 0.2;
+  transform: translate(-50%, -50%) rotate(26deg) scaleY(0.65);
+  width: calc(var(--art-w) * 0.36);
 }
 
 .hand-silhouette {
-  fill: var(--hand-fill);
-  stroke: var(--hand-stroke);
+  fill: url(#human-material);
+  stroke: var(--hand-outline);
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.7;
+  stroke-width: 0.9;
+}
+
+.robot-hand .hand-silhouette {
+  fill: url(#robot-material);
+  stroke: var(--robot-outline);
 }
 
 .hand-detail {
   fill: none;
-  opacity: 0.55;
-  stroke: var(--hand-stroke);
+  opacity: 0.36;
+  stroke: #835437;
   stroke-linecap: round;
   stroke-linejoin: round;
-  stroke-width: 1.2;
+  stroke-width: 1.1;
+}
+
+.robot-hand .hand-detail {
+  opacity: 0.65;
+  stroke: #425d69;
+}
+
+.hand-highlight {
+  fill: none;
+  opacity: 0.36;
+  stroke: #ffead1;
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.hand-highlight--fine {
+  opacity: 0.55;
+  stroke-width: 1.8;
+}
+
+.human-nail {
+  fill: url(#nail-material);
+  stroke: #c29477;
+  stroke-width: 0.65;
 }
 
 .joint {
-  fill: var(--joint-fill);
-  stroke: var(--hand-stroke);
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  stroke-width: 1.7;
-}
-
-.joint-inner {
-  fill: none;
-  opacity: 0.7;
-  stroke: var(--hand-stroke);
+  fill: url(#joint-material);
+  stroke: #a4b4b9;
   stroke-width: 1.2;
 }
 
+.joint-inner {
+  fill: #263e48;
+  stroke: #b5c4c8;
+  stroke-width: 2;
+}
+
 .rivet {
-  fill: var(--hand-stroke);
-  opacity: 0.6;
+  fill: #253f4b;
+  stroke: #dce5e3;
+  stroke-width: 0.8;
+}
+
+.robot-inlay {
+  fill: #374f5a;
+  stroke: #dae3e1;
+  stroke-width: 0.8;
+}
+
+.robot-trace {
+  fill: none;
+  stroke: #7e9eaa;
+  stroke-width: 0.9;
+}
+
+.robot-highlight {
+  fill: none;
+  opacity: 0.8;
+  stroke: #fffdf4;
+  stroke-linecap: round;
+  stroke-width: 2;
 }
 
 .status-light {
-  fill: var(--clay);
-  opacity: 0.55;
+  fill: #d2e6d3;
+  filter: drop-shadow(0 0 3px #b1dbcb);
 }
 
 .human-hand,
 .robot-hand {
-  opacity: calc(0.62 + var(--clasp) * 0.38);
-  // Pivot on the meeting point: the arms run off-canvas, so the default
-  // fill-box center would swing the fingertips when the groups rotate.
   transform-box: view-box;
-  transform-origin: 600px 300px;
-  will-change: transform;
+  transform-origin: 600px 310px;
 }
 
-// The artwork is drawn in the joined state. At --clasp: 0 the hands are
-// offset outward (apart); scrolling returns them to the drawn position while
-// the pointer adds depth (--lx/--ly, weighted per layer).
+// Both final fingertip positions are exactly (600, 310). Shared rotation
+// and scene-level parallax preserve contact even when the pointer moves.
 .human-hand {
-  transform: translate3d(
-      calc((var(--clasp) - 1) * 96px + var(--lx) * 26px),
-      calc((1 - var(--clasp)) * 14px + var(--ly) * 18px),
-      0
-    )
-    rotate(calc((1 - var(--clasp)) * 2.5deg));
+  transform: translate(calc((var(--clasp) - 1) * 76px), calc((var(--clasp) - 1) * 66px))
+    rotate(calc(16deg + (1 - var(--clasp)) * 5deg));
 }
 
 .robot-hand {
-  transform: translate3d(
-      calc((1 - var(--clasp)) * 96px + var(--lx) * 32px),
-      calc((1 - var(--clasp)) * -12px + var(--ly) * 22px),
-      0
-    )
-    rotate(calc((1 - var(--clasp)) * -2.5deg));
+  transform: translate(calc((1 - var(--clasp)) * 76px), calc((1 - var(--clasp)) * 66px))
+    rotate(calc(16deg - (1 - var(--clasp)) * 5deg));
 }
 
-// Idle float lives on nested groups so it composes with the parent's
-// var-driven transform instead of fighting it.
-.float {
-  animation: hand-float 7s ease-in-out infinite;
-}
-
-.float--offset {
-  animation-delay: -3.5s;
-}
-
-@keyframes hand-float {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-7px);
-  }
-}
-
-// Spark at the point where the fingertips meet. Opacity ramps with clasp^3 so
-// it only appears once the hands are truly close, then scales up to a pop.
 .connection-spark {
-  height: 120px;
+  height: 100px;
   left: 50%;
-  opacity: calc(var(--clasp) * var(--clasp) * var(--clasp));
+  opacity: calc(var(--clasp) * var(--clasp) * var(--clasp) * var(--clasp));
   position: absolute;
-  top: 57%;
-  transform: translate(-50%, -50%) translate3d(calc(var(--lx) * 46px), calc(var(--ly) * 30px), 0)
-    scale(calc(0.6 + var(--clasp) * 0.4));
-  width: 120px;
+  top: calc(var(--art-w) * 0.2583 - 38px);
+  transform: translate(-50%, -50%) scale(calc(0.5 + var(--clasp) * 0.5));
+  width: 100px;
 }
 
 .spark-core {
-  background: radial-gradient(circle, var(--paper-strong) 0 18%, var(--clay) 30%, transparent 70%);
+  background: radial-gradient(circle, #fff9de 0 5%, #e4bc7b 16%, transparent 65%);
   border-radius: 50%;
-  height: 22px;
+  height: 32px;
   inset: 0;
   margin: auto;
   position: absolute;
-  width: 22px;
+  width: 32px;
 }
 
 .spark-ring {
-  animation: spark-pulse 2.8s ease-out infinite;
+  animation: spark-pulse 3.4s ease-out infinite;
   border: 1px solid var(--clay);
   border-radius: 50%;
   height: 22px;
@@ -597,22 +626,56 @@ textarea {
 }
 
 .spark-ring--delayed {
-  animation-delay: 1.4s;
+  animation-delay: 1.7s;
 }
 
 @keyframes spark-pulse {
   0% {
-    opacity: 0.55;
+    opacity: 0.4;
     transform: scale(0.7);
   }
-  80% {
-    opacity: 0;
-    transform: scale(3.4);
-  }
+  85%,
   100% {
     opacity: 0;
-    transform: scale(3.4);
+    transform: scale(2.8);
   }
+}
+
+.scene-caption {
+  align-items: center;
+  bottom: 12px;
+  color: var(--soft);
+  display: flex;
+  font-family: var(--display);
+  font-size: 0.63rem;
+  gap: 16px;
+  justify-content: space-between;
+  left: 50%;
+  letter-spacing: 0.13em;
+  max-width: 760px;
+  position: absolute;
+  text-transform: uppercase;
+  transform: translateX(-50%);
+  width: calc(100% - 48px);
+}
+
+.scene-caption__center {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+  letter-spacing: 0.08em;
+}
+
+.scene-caption__center > span:first-child {
+  border: 1px solid var(--clay);
+  border-radius: 50%;
+  height: 5px;
+  width: 5px;
+}
+
+.is-connected .scene-caption__center > span:first-child {
+  background: var(--clay);
+  box-shadow: 0 0 8px var(--scene-halo);
 }
 
 .focus-row,
@@ -640,9 +703,14 @@ textarea {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius);
+  box-shadow:
+    0 3px 14px rgba(17, 19, 20, 0.025),
+    inset 0 1px 0 var(--paper-strong);
   transition:
     background-color 180ms ease,
-    border-color 180ms ease;
+    border-color 180ms ease,
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
 
 .focus-card {
@@ -653,6 +721,13 @@ textarea {
   min-height: 92px;
   padding: 20px 28px;
   text-decoration: none;
+}
+
+.focus-card:hover,
+.research-card:hover {
+  border-color: var(--line-strong);
+  box-shadow: 0 10px 24px var(--scene-shadow);
+  transform: translateY(-3px);
 }
 
 .focus-card svg {
@@ -1143,10 +1218,6 @@ textarea {
     padding-bottom: 40px;
   }
 
-  .hands-scene {
-    top: 130px;
-  }
-
   .focus-row,
   .featured-research,
   .about-grid,
@@ -1226,8 +1297,26 @@ textarea {
   }
 
   .hands-scene {
-    opacity: 0.78;
-    top: 164px;
+    --art-w: 680px;
+    height: calc(var(--art-w) * 0.38 + 36px);
+    margin-top: 20px;
+  }
+
+  .hands-webgl {
+    inset: -30px 0 0;
+  }
+
+  .scene-caption {
+    flex-wrap: wrap;
+    font-size: 0.58rem;
+    gap: 14px;
+    width: calc(100% - 36px);
+  }
+
+  .scene-caption__center {
+    justify-content: center;
+    order: 1;
+    width: 100%;
   }
 
   .hero-actions {

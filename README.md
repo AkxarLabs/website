@@ -59,3 +59,21 @@ The site is served from the custom domain in `CNAME`. Astro defaults to:
 - `base`: `/`
 
 Override these in Actions or another host with `SITE` and `BASE_PATH`.
+
+## 3D hero artwork
+
+The hero uses local Three.js/WebGL meshes with drawn contour lines and vertex
+marks. The renderer loads near the viewport and pauses when idle or offscreen.
+Reduced motion keeps the hands connected; an SVG illustration covers browsers
+without WebGL or JavaScript.
+
+To change the authored hand shapes or sketch lines, edit
+`scripts/generate-hands.mjs`, then regenerate the checked-in static model:
+
+```bash
+npm run generate:hands
+npm run build
+```
+
+The GLB and renderer are served with the rest of the site. No external model
+hosting, API keys, CDN, or server runtime is required.

@@ -19,11 +19,19 @@ human/AI hand concept.
 
 - `SiteHeader.astro`: brand mark, primary navigation, and persisted light/dark
   mode toggle.
-- `HandsConnection.astro`: hero animation. Inline SVG artwork is drawn in the
-  joined state; `--clasp` (0 -> 1, driven by scrollY over ~38vh) interpolates
-  the hands from apart to joined, `--scroll-shift` gives the scene slower
-  scroll parallax, and pointer movement shifts each `[data-parallax]` layer by
-  its `data-depth`. Reduced motion renders the static joined state.
+- `HandsConnection.astro` / `hands-scene.ts`: real Three.js/WebGL mesh hands
+  with matte paper and porcelain surfaces, spatial ink contours, construction
+  loops, vertex marks, perspective, studio lighting, and cast shadows. The human
+  hand is one continuous sculpted surface; the robot has distinct finger segments
+  and hinges. The upper-left and lower-right hands approach diagonally on scroll
+  and rotate in depth. Pointer movement gently turns the whole 3D composition
+  around the shared fingertip contact point. Reduced motion fixes the joined pose.
+  The renderer is lazy-loaded and renders only while changing and visible.
+  `public/models/hands.glb` is authored locally by `scripts/generate-hands.mjs`;
+  run `npm run generate:hands` after changing its geometry or ink paths. Geometry
+  is batched by material for mobile performance. The inline SVG is a fallback for
+  disabled JavaScript, unavailable WebGL, or context loss. All assets are local,
+  base-path aware, and work on static GitHub Pages with no server or CDN.
 - `Footer.astro`: footer navigation, RSS link, and (newsletter signup removed until a real mailing list exists).
 - `PageLayout.astro`: shared layout for about, research, tag, and article pages.
 
