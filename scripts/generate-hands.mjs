@@ -90,7 +90,7 @@ function mark(group, p) {
 
 // A folded paper strip has two broad pitched faces, an underside, and narrow
 // cut edges. Each change in pitch is a physical knuckle fold.
-function foldedStrip(group, centers, widths, ridges, segmented = false) {
+function foldedStrip(group, centers, widths, ridges) {
   const ribs = centers.map((p, i) => {
     const before = v(centers[Math.max(0, i - 1)]),
       after = v(centers[Math.min(centers.length - 1, i + 1)]);
@@ -104,8 +104,6 @@ function foldedStrip(group, centers, widths, ridges, segmented = false) {
   for (let i = 0; i < ribs.length - 1; i++) {
     let a = ribs[i],
       b = ribs[i + 1];
-    // Robotic fingers are made from separately folded paper links.
-    if (segmented && i > 0) a = a.map((p, k) => v(p).lerp(v(b[k]), 0.045).toArray());
     panels(group, [...quad(a[0], b[0], b[1], a[1]), ...quad(a[1], b[1], b[2], a[2])]);
     const backA = a.map((p) => [p[0], p[1], p[2] - 0.035]);
     const backB = b.map((p) => [p[0], p[1], p[2] - 0.035]);
@@ -128,31 +126,191 @@ function foldedStrip(group, centers, widths, ridges, segmented = false) {
   for (const rib of ribs.slice(1, -1)) mark(group, rib[1]);
 }
 
+// Robot joints are eight-sided folded-paper hinge housings, with a smaller
+// inset axle. Their silhouette is mechanical while every face remains paper.
+function paperHinge(group, point, radius) {
+  const z = point[2] + 0.14;
+  const outer = Array.from({ length: 8 }, (_, i) => {
+    const angle = (i / 8) * Math.PI * 2 + Math.PI / 8;
+    return [point[0] + Math.cos(angle) * radius, point[1] + Math.sin(angle) * radius, z];
+  });
+  const inset = outer.map((p) => [
+    point[0] + (p[0] - point[0]) * 0.64,
+    point[1] + (p[1] - point[1]) * 0.64,
+    z + 0.07,
+  ]);
+  for (let i = 0; i < 8; i++) {
+    const j = (i + 1) % 8;
+    panels(group, quad(outer[i], outer[j], inset[j], inset[i]));
+    panels(group, [[inset[i], inset[j], [point[0], point[1], z + 0.075]]], cut);
+  }
+  stroke(group, [...outer, outer[0]]);
+  stroke(group, [...inset, inset[0]], faintPencil);
+  stroke(group, [
+    [point[0] - radius * 0.28, point[1], z + 0.085],
+    [point[0] + radius * 0.28, point[1], z + 0.085],
+  ]);
+}
+
+// Separate angular finger shells leave real gaps at the hinge axes. Unlike
+// the organic paper strips, these links have broad flat backs and blunt pads.
+function roboticFinger(group, finger) {
+  const points = finger.points.map((p) => [...p]);
+  if (finger.name === 'index') points[2] = [-0.75, 0, 0];
+  for (let i = 0; i < points.length - 1; i++) {
+    const direction = v(points[i + 1])
+      .sub(v(points[i]))
+      .normalize();
+    const start = v(points[i]).addScaledVector(direction, i === 0 ? 0.12 : 0.11);
+    const end = v(points[i + 1]).addScaledVector(direction, i === 2 ? 0 : -0.11);
+    const normal = new THREE.Vector3(-direction.y, direction.x, 0).normalize();
+    const width = Math.max(0.115, finger.widths[i] * 0.82);
+    const rib = (center, w) => [
+      center
+        .clone()
+        .addScaledVector(normal, w)
+        .add(new THREE.Vector3(0, 0, 0.03))
+        .toArray(),
+      center
+        .clone()
+        .addScaledVector(normal, w * 0.66)
+        .add(new THREE.Vector3(0, 0, 0.18))
+        .toArray(),
+      center
+        .clone()
+        .addScaledVector(normal, -w * 0.66)
+        .add(new THREE.Vector3(0, 0, 0.18))
+        .toArray(),
+      center
+        .clone()
+        .addScaledVector(normal, -w)
+        .add(new THREE.Vector3(0, 0, 0.03))
+        .toArray(),
+      center
+        .clone()
+        .addScaledVector(normal, -w * 0.75)
+        .add(new THREE.Vector3(0, 0, -0.035))
+        .toArray(),
+      center
+        .clone()
+        .addScaledVector(normal, w * 0.75)
+        .add(new THREE.Vector3(0, 0, -0.035))
+        .toArray(),
+    ];
+    const a = rib(start, width),
+      b = rib(end, width * (i === 2 ? 0.74 : 0.9));
+    for (let k = 0; k < 6; k++) panels(group, quad(a[k], b[k], b[(k + 1) % 6], a[(k + 1) % 6]));
+    for (let k = 1; k < 5; k++) {
+      panels(group, [[a[0], a[k + 1], a[k]]], cut);
+      panels(group, [[b[0], b[k], b[k + 1]]], cut);
+    }
+    stroke(group, [...a, a[0]]);
+    stroke(group, [...b, b[0]]);
+    stroke(group, [a[1], b[1]], faintPencil);
+    stroke(group, [a[2], b[2]], faintPencil);
+    // A folded tab sits over each link, like a paper actuator cover.
+    const mid = start.clone().lerp(end, 0.52);
+    const flap = [
+      mid
+        .clone()
+        .addScaledVector(normal, width * 0.65)
+        .add(new THREE.Vector3(0, 0, 0.185)),
+      mid
+        .clone()
+        .addScaledVector(direction, 0.14)
+        .add(new THREE.Vector3(0, 0, 0.23)),
+      mid
+        .clone()
+        .addScaledVector(normal, -width * 0.65)
+        .add(new THREE.Vector3(0, 0, 0.185)),
+    ];
+    panels(group, [flap.map((p) => p.toArray())]);
+    stroke(
+      group,
+      flap.map((p) => p.toArray()),
+      faintPencil,
+    );
+  }
+  for (let i = 0; i < 3; i++)
+    paperHinge(group, points[i], finger.widths[i] * (i === 0 ? 1.02 : 0.94));
+}
+
+function roboticPalm(group) {
+  const outline = [
+    [-5, -0.12, 0.03],
+    [-4.65, 0.24, 0.03],
+    [-3.25, 0.24, 0.03],
+    [-2.91, -0.1, 0.03],
+    [-2.91, -1.15, 0.03],
+    [-3.35, -1.63, 0.03],
+    [-4.65, -1.63, 0.03],
+    [-5, -1.22, 0.03],
+  ];
+  const center = [-3.99, -0.68, 0.34];
+  const inset = outline.map((p) => [
+    center[0] + (p[0] - center[0]) * 0.74,
+    center[1] + (p[1] - center[1]) * 0.74,
+    0.34,
+  ]);
+  for (let i = 0; i < 8; i++) {
+    const j = (i + 1) % 8;
+    panels(group, quad(outline[i], outline[j], inset[j], inset[i]));
+    panels(group, [[inset[i], inset[j], center]]);
+    const a = [...outline[i]],
+      b = [...outline[j]];
+    a[2] -= 0.055;
+    b[2] -= 0.055;
+    panels(group, quad(outline[i], a, b, outline[j]), cut);
+    panels(group, [[b, a, [-3.99, -0.68, -0.04]]]);
+  }
+  stroke(group, [...outline, outline[0]]);
+  stroke(group, [...inset, inset[0]]);
+  // Converging folded metacarpal rails make the mechanical construction clear.
+  for (const [y, endY] of [
+    [-0.22, -0.12],
+    [-0.65, -0.6],
+    [-1.05, -1.08],
+  ]) {
+    stroke(
+      group,
+      [
+        [-4.55, y, 0.355],
+        [-3.9, y, 0.355],
+        [-3.28, endY, 0.355],
+      ],
+      faintPencil,
+    );
+  }
+  paperHinge(group, [-4.63, -0.14, 0.25], 0.11);
+  paperHinge(group, [-4.63, -1.23, 0.25], 0.11);
+  foldedStrip(
+    group,
+    [
+      [-7.7, -0.66, -0.08],
+      [-6.6, -0.65, -0.04],
+      [-5.65, -0.65, 0],
+    ],
+    [0.91, 0.81, 0.63],
+    [0.43, 0.36, 0.27],
+  );
+  // The cuff is separated from the palm by an exposed, faceted paper gimbal.
+  paperHinge(group, [-5.34, -0.66, 0], 0.43);
+}
+
 // The palm is an origami fan: large planar triangles meet along a raised fold.
-function foldedPalm(group, mechanical) {
-  const outline = mechanical
-    ? [
-        [-5.25, -0.05, 0.02],
-        [-4.6, 0.26, 0.04],
-        [-2.85, 0.25, 0.01],
-        [-2.68, -0.3, 0.01],
-        [-2.9, -1.05, -0.02],
-        [-3.5, -1.83, -0.04],
-        [-4.55, -1.55, -0.02],
-        [-5.3, -1.23, 0.01],
-      ]
-    : [
-        [-5.25, -0.07, 0.01],
-        [-4.45, 0.25, 0.07],
-        [-3.5, 0.35, 0.03],
-        [-2.8, 0.24, 0.01],
-        [-2.75, -0.6, 0.01],
-        [-3.05, -1.25, -0.04],
-        [-3.55, -1.8, -0.04],
-        [-4.5, -1.57, -0.02],
-        [-5.3, -1.22, 0.01],
-      ];
-  const ridge = mechanical ? [-3.98, -0.65, 0.48] : [-4.02, -0.65, 0.4];
+function foldedPalm(group) {
+  const outline = [
+    [-5.25, -0.07, 0.01],
+    [-4.45, 0.25, 0.07],
+    [-3.5, 0.35, 0.03],
+    [-2.8, 0.24, 0.01],
+    [-2.75, -0.6, 0.01],
+    [-3.05, -1.25, -0.04],
+    [-3.55, -1.8, -0.04],
+    [-4.5, -1.57, -0.02],
+    [-5.3, -1.22, 0.01],
+  ];
+  const ridge = [-4.02, -0.65, 0.4];
   const underside = [-4.05, -0.67, -0.09];
   for (let i = 0; i < outline.length; i++) {
     const a = outline[i],
@@ -239,9 +397,13 @@ for (const [hand, mechanical] of [
   [human, false],
   [robot, true],
 ]) {
-  foldedPalm(hand, mechanical);
-  for (const finger of fingers)
-    foldedStrip(hand, finger.points, finger.widths, finger.folds, mechanical);
+  if (mechanical) {
+    roboticPalm(hand);
+    for (const finger of fingers) roboticFinger(hand, finger);
+  } else {
+    foldedPalm(hand);
+    for (const finger of fingers) foldedStrip(hand, finger.points, finger.widths, finger.folds);
+  }
 }
 
 // Batch panels and creases by material. The paper surfaces retain their flat

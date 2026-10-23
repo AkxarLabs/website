@@ -21,8 +21,11 @@ human/AI hand concept.
   mode toggle.
 - `HandsConnection.astro` / `hands-scene.ts`: actual folded-sheet origami
   hands below and around the headline. Broad planar palm panels, pitched finger
-  strips, raised creases, thin cut edges, and subtle pencil marks define the form;
-  no rounded skin or mechanical primitives are used. Both share matte paper colors
+  strips, raised creases, thin cut edges, and subtle pencil marks define the form.
+  The left hand has continuous organic folds; the right is explicitly robotic,
+  with separate blunt finger shells, exposed octagonal paper hinges, a chamfered
+  palm plate, folded actuator tabs, and a faceted wrist gimbal. Every mechanical
+  part is assembled from paper panels. Both share matte paper colors
   close to the background, with procedural grain and soft cast shadows. The wrists
   remain short and broad. The initial fingertip gap is deliberately small. The first
   ~180px of scrolling lower the fingers clear of the headline, then bring them
