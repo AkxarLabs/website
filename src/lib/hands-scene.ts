@@ -2,12 +2,11 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 
-/** Real mesh rendering. The inline SVG remains the no-WebGL/no-JS fallback. */
+/** Real mesh rendering. A static render remains the no-WebGL/no-JS fallback. */
 export async function mountHandsScene(element: HTMLElement) {
   const host = element.querySelector<HTMLElement>('[data-hands-webgl]');
   const hero = element.closest<HTMLElement>('.hero');
-  const label = element.querySelector<HTMLElement>('[data-connection-label]');
-  const fallback = element.querySelector<SVGElement>('.hands-fallback');
+  const fallback = element.querySelector<HTMLElement>('.hands-fallback');
   if (!host || !element.dataset.model) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)');
@@ -42,7 +41,7 @@ export async function mountHandsScene(element: HTMLElement) {
   pmrem.dispose();
   scene.add(new THREE.HemisphereLight(0xfff8e9, 0x696b6b, 1.1));
   const key = new THREE.DirectionalLight(0xffedd7, 2.1);
-  key.position.set(-5, 8, 12);
+  key.position.set(-3, 6, 16);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
   Object.assign(key.shadow.camera, {
@@ -55,14 +54,14 @@ export async function mountHandsScene(element: HTMLElement) {
   });
   key.shadow.normalBias = 0.025;
   key.shadow.bias = -0.0002;
-  key.shadow.radius = 3;
+  key.shadow.radius = 5;
   scene.add(key);
   const fill = new THREE.DirectionalLight(0xd9e7f2, 1.0);
   fill.position.set(8, -1, 7);
   scene.add(fill);
-  const shadowMaterial = new THREE.ShadowMaterial({ opacity: 0.13 });
+  const shadowMaterial = new THREE.ShadowMaterial({ opacity: 0.065 });
   const ground = new THREE.Mesh(new THREE.PlaneGeometry(90, 35), shadowMaterial);
-  ground.position.z = -2;
+  ground.position.z = -1.8;
   ground.receiveShadow = true;
   scene.add(ground);
 
@@ -106,40 +105,34 @@ export async function mountHandsScene(element: HTMLElement) {
   robot.rotation.order = 'ZYX';
   world.add(model);
 
-  const orbitMaterial = new THREE.LineBasicMaterial({
-    color: 0x9c8a72,
-    transparent: true,
-    opacity: 0.19,
+  // Paper grain is procedural and follows the geometry, with no texture fetch.
+  model.traverse((object) => {
+    if (!(object instanceof THREE.Mesh)) return;
+    const materials = Array.isArray(object.material) ? object.material : [object.material];
+    for (const material of materials) {
+      if (!(material instanceof THREE.MeshStandardMaterial)) continue;
+      material.metalness = 0;
+      material.roughness = 0.96;
+      material.flatShading = true;
+      material.onBeforeCompile = (shader) => {
+        shader.vertexShader = shader.vertexShader
+          .replace('#include <common>', '#include <common>\nvarying vec3 vPaperPosition;')
+          .replace(
+            '#include <begin_vertex>',
+            '#include <begin_vertex>\nvPaperPosition = position;',
+          );
+        shader.fragmentShader = shader.fragmentShader
+          .replace(
+            '#include <common>',
+            '#include <common>\nvarying vec3 vPaperPosition;\nfloat paperGrain(vec3 p) { return fract(sin(dot(p, vec3(127.1,311.7,74.7))) * 43758.5453); }',
+          )
+          .replace(
+            '#include <color_fragment>',
+            '#include <color_fragment>\ndiffuseColor.rgb *= 1.0 + (paperGrain(vPaperPosition * 210.0) - 0.5) * 0.065;',
+          );
+      };
+    }
   });
-  for (const angle of [-0.38, 0.46]) {
-    const points = Array.from({ length: 97 }, (_, i) => {
-      const t = (i / 96) * Math.PI * 2;
-      return new THREE.Vector3(Math.cos(t) * 4.4, Math.sin(t) * 1.7, -0.8);
-    });
-    const orbit = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), orbitMaterial);
-    orbit.rotation.z = angle;
-    world.add(orbit);
-  }
-  const connection = new THREE.Group();
-  const gold = new THREE.MeshStandardMaterial({
-    color: 0xc39858,
-    roughness: 0.4,
-    metalness: 0.3,
-    emissive: 0xd4a86d,
-    emissiveIntensity: 0.35,
-  });
-  connection.add(new THREE.Mesh(new THREE.IcosahedronGeometry(0.075, 1), gold));
-  const ring = new THREE.LineLoop(
-    new THREE.BufferGeometry().setFromPoints(
-      Array.from({ length: 48 }, (_, i) => {
-        const t = (i / 48) * Math.PI * 2;
-        return new THREE.Vector3(Math.cos(t) * 0.24, Math.sin(t) * 0.24, 0.03);
-      }),
-    ),
-    new THREE.LineBasicMaterial({ color: 0xb88b52, transparent: true, opacity: 0.5 }),
-  );
-  connection.add(ring);
-  world.add(connection);
 
   let visible = true;
   let contextLost = false;
@@ -165,20 +158,22 @@ export async function mountHandsScene(element: HTMLElement) {
     pointerX = reduced.matches ? 0 : THREE.MathUtils.lerp(pointerX, targetX, smoothing);
     pointerY = reduced.matches ? 0 : THREE.MathUtils.lerp(pointerY, targetY, smoothing);
     const apart = 1 - clasp;
-    // Rotations happen around the index fingertips, preserving final contact.
-    human.position.set(-0.025 - apart * 1.4, apart * 1.15, apart * 0.55);
-    human.rotation.set(0.12 + apart * 0.12, -0.06 - apart * 0.38, -0.27 - apart * 0.08);
-    robot.position.set(0.025 + apart * 1.4, -apart * 1.15, -apart * 0.45);
-    robot.rotation.set(-0.09 - apart * 0.13, Math.PI + 0.12 + apart * 0.38, -0.27 + apart * 0.06);
-    world.rotation.set(0.1 + pointerY * 0.13, pointerX * 0.18, 0);
-    connection.visible = clasp > 0.96;
-    connection.scale.setScalar(THREE.MathUtils.clamp((clasp - 0.96) / 0.04, 0, 1));
+    // The hands cup the copy from opposite sides, retaining an open center.
+    const compact = host.clientWidth <= 900;
+    const copyWidth = hero?.querySelector<HTMLElement>('.hero-copy')?.clientWidth ?? 620;
+    const edge = compact ? 2.8 : Math.max(5.7, (copyWidth / host.clientWidth) * 12 + 0.3);
+    const scale = compact ? 0.8 : 1;
+    human.scale.setScalar(scale);
+    robot.scale.setScalar(scale);
+    human.position.set(-edge - apart * 0.25, (compact ? 1.0 : 1.6) + apart * 0.2, 0.15);
+    human.rotation.set(0.22, -0.08 - apart * 0.08, -0.18 - apart * 0.05);
+    robot.position.set(edge + apart * 0.25, (compact ? -0.9 : -1.45) - apart * 0.2, -0.1);
+    robot.rotation.set(-0.08, Math.PI + 0.08 + apart * 0.08, -0.18 + apart * 0.05);
+    world.rotation.set(0.06 + pointerY * 0.07, pointerX * 0.09, 0);
     renderer.render(scene, camera);
     element.style.setProperty('--clasp', clasp.toFixed(4));
     hero?.style.setProperty('--clasp', clasp.toFixed(4));
-    const connected = clasp > 0.97;
-    element.classList.toggle('is-connected', connected);
-    if (label) label.textContent = connected ? 'In connection' : 'Scroll to connect';
+
     if (!contextLost) {
       element.classList.add('has-webgl');
       host.removeAttribute('aria-hidden');
@@ -201,7 +196,7 @@ export async function mountHandsScene(element: HTMLElement) {
     const { width, height } = host.getBoundingClientRect();
     if (!width || !height) return;
     camera.aspect = width / height;
-    const worldWidth = THREE.MathUtils.clamp(width / 50, 16.5, 27);
+    const worldWidth = width <= 900 ? 12 : 24;
     camera.position.set(
       0,
       0.2,
@@ -230,20 +225,26 @@ export async function mountHandsScene(element: HTMLElement) {
   };
   const theme = () => {
     const dark = document.documentElement.dataset.theme === 'dark';
-    shadowMaterial.opacity = dark ? 0.26 : 0.13;
-    orbitMaterial.color.set(dark ? 0xa99a82 : 0x9c8a72);
+    shadowMaterial.opacity = dark ? 0.16 : 0.065;
+    renderer.toneMappingExposure = dark ? 0.72 : 0.9;
     model.traverse((object) => {
       if (object instanceof THREE.Line) {
         const material = object.material as THREE.LineBasicMaterial;
-        material.color.set(
-          dark
-            ? material.name === 'robot-ink'
-              ? 0x566c75
-              : 0x76604a
-            : material.name === 'robot-ink'
-              ? 0x425860
-              : 0x685346,
-        );
+        material.color.set(dark ? 0x9c9181 : 0x827666);
+      } else if (object instanceof THREE.Mesh) {
+        const materials = Array.isArray(object.material) ? object.material : [object.material];
+        for (const material of materials) {
+          if (!(material instanceof THREE.MeshStandardMaterial)) continue;
+          material.color.set(
+            dark
+              ? material.name === 'graphite'
+                ? 0x25231e
+                : 0x333028
+              : material.name === 'graphite'
+                ? 0xb9b0a2
+                : 0xc9c2b6,
+          );
+        }
       }
     });
     schedule();

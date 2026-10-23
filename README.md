@@ -62,10 +62,10 @@ Override these in Actions or another host with `SITE` and `BASE_PATH`.
 
 ## 3D hero artwork
 
-The hero uses local Three.js/WebGL meshes with drawn contour lines and vertex
-marks. The renderer loads near the viewport and pauses when idle or offscreen.
-Reduced motion keeps the hands connected; an SVG illustration covers browsers
-without WebGL or JavaScript.
+The hero uses local Three.js/WebGL paper sculptures with low-poly facets,
+pencil contours, and vertex marks framing the central headline. The renderer loads near the viewport and pauses when idle or offscreen.
+Reduced motion keeps the framing pose still; matching transparent poster renders
+cover loading and browsers without WebGL or JavaScript.
 
 To change the authored hand shapes or sketch lines, edit
 `scripts/generate-hands.mjs`, then regenerate the checked-in static model:
@@ -75,5 +75,7 @@ npm run generate:hands
 npm run build
 ```
 
-The GLB and renderer are served with the rest of the site. No external model
+Refresh the transparent `public/models/hands-poster-*.png` browser captures when
+the sculpture or composition changes. The GLB, posters, and renderer are served
+with the rest of the site. No external model
 hosting, API keys, CDN, or server runtime is required.

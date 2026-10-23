@@ -19,19 +19,20 @@ human/AI hand concept.
 
 - `SiteHeader.astro`: brand mark, primary navigation, and persisted light/dark
   mode toggle.
-- `HandsConnection.astro` / `hands-scene.ts`: real Three.js/WebGL mesh hands
-  with matte paper and porcelain surfaces, spatial ink contours, construction
-  loops, vertex marks, perspective, studio lighting, and cast shadows. The human
-  hand is one continuous sculpted surface; the robot has distinct finger segments
-  and hinges. The upper-left and lower-right hands approach diagonally on scroll
-  and rotate in depth. Pointer movement gently turns the whole 3D composition
-  around the shared fingertip contact point. Reduced motion fixes the joined pose.
-  The renderer is lazy-loaded and renders only while changing and visible.
-  `public/models/hands.glb` is authored locally by `scripts/generate-hands.mjs`;
-  run `npm run generate:hands` after changing its geometry or ink paths. Geometry
-  is batched by material for mobile performance. The inline SVG is a fallback for
-  disabled JavaScript, unavailable WebGL, or context loss. All assets are local,
-  base-path aware, and work on static GitHub Pages with no server or CDN.
+- `HandsConnection.astro` / `hands-scene.ts`: low-poly paper sculptures cup
+  the central headline from opposite sides, remaining apart. Both hands share
+  a warm, matte material close to the page background; dark mode uses charcoal
+  paper. Short, broad wrist fragments, flat facets, procedural paper grain,
+  pencil contours and vertex marks define the silhouettes. The human hand is a
+  continuous mesh; the robot has folded panels and articulated fingers, with no
+  metallic finish or display panel. The composition appears in the first viewport.
+  Scroll and pointer movement gently turn the hands without closing the center;
+  reduced motion fixes their pose. Rendering pauses when idle and offscreen.
+  `scripts/generate-hands.mjs` authors `public/models/hands.glb`; run
+  `npm run generate:hands` after changing geometry or ink paths. The matching
+  transparent `hands-poster-*.png` renders cover loading, disabled JavaScript,
+  unavailable WebGL and context loss; refresh them when the composition changes.
+  Assets use content revisions and the configured base path for GitHub Pages.
 - `Footer.astro`: footer navigation, RSS link, and (newsletter signup removed until a real mailing list exists).
 - `PageLayout.astro`: shared layout for about, research, tag, and article pages.
 

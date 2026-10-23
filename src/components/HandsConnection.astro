@@ -1,187 +1,44 @@
 ---
+import { createHash } from 'node:crypto';
+import { readFileSync } from 'node:fs';
 import { withBase } from '../lib/site';
+
+// Content revisions prevent a cached model from surviving a Pages deployment.
+const asset = (path: string) => {
+  const revision = createHash('sha256')
+    .update(readFileSync(`public${path}`))
+    .digest('hex')
+    .slice(0, 10);
+  return `${withBase(path)}?v=${revision}`;
+};
 ---
 
-<div class="hands-scene" data-hands-scene data-model={withBase('/models/hands.glb')}>
+<div class="hands-scene" data-hands-scene data-model={asset('/models/hands.glb')}>
   <div class="hands-depth">
-    <div class="hands-glow" aria-hidden="true"></div>
-
-    <div class="connection-orbit connection-orbit--outer" aria-hidden="true"></div>
-    <div class="connection-orbit connection-orbit--inner" aria-hidden="true"></div>
-
+    <picture class="hands-fallback">
+      <source media="(max-width: 900px)" srcset={asset('/models/hands-poster-mobile.png')} />
+      <img
+        src={asset('/models/hands-poster-desktop.png')}
+        width="1440"
+        height="720"
+        alt="Faceted paper sculptures of human and robotic hands cupping the headline from opposite sides"
+        decoding="async"
+      />
+    </picture>
     <div
       class="hands-webgl"
       data-hands-webgl
       aria-hidden="true"
       role="img"
-      aria-label="Three-dimensional human and robotic hands, drawn with sculpted surfaces, ink contours, and mesh vertices, reaching diagonally toward each other"
+      aria-label="Three-dimensional paper hands with pencil contours, framing the headline from opposite sides"
     >
     </div>
-    <svg
-      class="hands-illustration hands-fallback"
-      viewBox="0 0 1200 560"
-      preserveAspectRatio="xMidYMid meet"
-      role="img"
-      aria-label="A human hand and a robotic hand reaching toward each other until they connect"
-    >
-      <defs>
-        <linearGradient
-          id="human-material"
-          x1="0"
-          y1="250"
-          x2="0"
-          y2="365"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0" stop-color="#b98061"></stop>
-          <stop offset="0.22" stop-color="#e4b395"></stop>
-          <stop offset="0.42" stop-color="#f7d7b9"></stop>
-          <stop offset="0.62" stop-color="#deb092"></stop>
-          <stop offset="0.84" stop-color="#b77d5c"></stop>
-          <stop offset="1" stop-color="#805039"></stop>
-        </linearGradient>
-        <linearGradient id="robot-material" x1="0.15" y1="0" x2="0.4" y2="1">
-          <stop offset="0" stop-color="#74868e"></stop>
-          <stop offset="0.18" stop-color="#e1e9e9"></stop>
-          <stop offset="0.38" stop-color="#fcfdf9"></stop>
-          <stop offset="0.52" stop-color="#bbc9cb"></stop>
-          <stop offset="0.8" stop-color="#75888f"></stop>
-          <stop offset="1" stop-color="#394f59"></stop>
-        </linearGradient>
-        <radialGradient id="joint-material" cx="35%" cy="25%" r="75%">
-          <stop offset="0" stop-color="#b4c2c7"></stop>
-          <stop offset="0.45" stop-color="#5b707a"></stop>
-          <stop offset="0.75" stop-color="#293e48"></stop>
-          <stop offset="1" stop-color="#122832"></stop>
-        </radialGradient>
-        <linearGradient id="nail-material" x1="0" y1="0" x2="0.2" y2="1">
-          <stop offset="0" stop-color="#fff0de"></stop>
-          <stop offset="1" stop-color="#d8a98d"></stop>
-        </linearGradient>
-        <filter
-          id="hand-shadow"
-          x="-15%"
-          y="-80%"
-          width="130%"
-          height="280%"
-          color-interpolation-filters="sRGB"
-        >
-          <feDropShadow dx="0" dy="18" stdDeviation="13" flood-color="#34271e" flood-opacity="0.18"
-          ></feDropShadow>
-          <feDropShadow dx="0" dy="2" stdDeviation="1.2" flood-color="#34271e" flood-opacity="0.2"
-          ></feDropShadow>
-        </filter>
-      </defs>
-      <g class="human-hand">
-        <g transform="translate(14 0)" filter="url(#hand-shadow)">
-          <path
-            class="hand-silhouette"
-            d="M-1600 272C-900 268 -400 268 -20 262C90 252 200 248 296 256 342 260 372 263 400 266 434 269 462 275 490 283 520 291 548 297 568 301 577 303 583 306 586 310 590 316 586 321 579 320 570 319 559 316 548 312 528 305 508 300 492 299 501 304 516 311 530 319 539 324 546 330 548 336 549 342 544 345 537 341 525 334 511 326 498 321 504 327 513 335 520 343 525 349 527 355 523 359 518 363 511 359 505 352 496 342 487 334 479 329 483 335 488 342 491 349 493 355 490 359 485 357 478 354 471 346 465 338 452 322 438 314 422 310 430 320 440 333 446 346 450 356 448 364 440 363 430 361 418 349 408 336 397 322 385 313 370 308 344 300 316 298 288 302 204 312 100 330 -20 344C-400 356 -900 360 -1600 358Z"
-          ></path>
-          <g class="hand-detail">
-            <path d="M402 268c18 12 36 21 56 27"></path>
-            <path d="M356 262c12 14 24 26 40 36"></path>
-            <path d="M486 284c4 5 7 10 8 15"></path>
-            <path d="M298 256c-7 16-9 32-7 48"></path>
-            <path d="M314 257c-7 16-9 32-7 48"></path>
-            <path d="M322 280c40-4 64 1 91 13"></path>
-            <path d="M426 288c24 8 42 13 61 14"></path>
-            <path d="M462 306c12 5 22 11 31 17"></path>
-            <path d="M516 294l-3 8m33 0-2 8m-38 14-4 5"></path>
-          </g>
-          <path class="hand-highlight" d="M-20 274C130 260 236 260 296 267c72 3 120 9 174 25"
-          ></path>
-          <path
-            class="hand-highlight hand-highlight--fine"
-            d="M431 304c-16-5-33-9-49-10M502 289l44 12"></path>
-          <path class="human-nail" d="M565 302c9 1 15 4 18 8-4 2-10 0-18-2Z"></path>
-        </g>
-      </g>
-
-      <g class="robot-hand">
-        <g transform="translate(-24 3)" filter="url(#hand-shadow)">
-          <path
-            class="hand-silhouette"
-            d="M2600 230 1220 250 1010 262c-20 2-34 10-40 22l-4 12c12 20 34 26 58 24l196 16L2600 356"
-          ></path>
-          <path class="hand-detail" d="M2600 258 1040 280M2600 330 1046 306"></path>
-          <path class="hand-detail" d="M1100 258v68M1180 253v80M1300 247v94M1480 242v106"></path>
-
-          <circle class="joint" cx="948" cy="294" r="22"></circle>
-          <circle class="joint-inner" cx="948" cy="294" r="8"></circle>
-
-          <path
-            class="hand-silhouette"
-            d="M938 272c-32-6-62-2-82 10-10 6-16 16-16 28 0 20 12 36 32 42 20 6 44 4 62-6 12-8 18-22 16-38-1-14-4-28-12-36Z"
-          ></path>
-          <path class="hand-detail" d="M862 286c-6 12-6 30 2 44"></path>
-          <circle class="rivet" cx="922" cy="288" r="2.6"></circle>
-          <circle class="rivet" cx="924" cy="336" r="2.6"></circle>
-
-          <circle class="joint" cx="842" cy="303" r="9"></circle>
-          <rect class="hand-silhouette" x="762" y="292" width="72" height="22" rx="11"></rect>
-          <circle class="joint" cx="754" cy="303" r="8"></circle>
-          <rect class="hand-silhouette" x="686" y="294" width="62" height="20" rx="10"></rect>
-          <circle class="joint" cx="680" cy="304" r="7"></circle>
-          <path class="hand-silhouette" d="M674 297 648 297c-14 0-24 5-24 10 0 5 10 9 24 9l26-3Z"
-          ></path>
-          <path class="robot-inlay" d="M878 288c14-5 28-5 43-1l5 32c-13 8-28 11-43 7Z"></path>
-          <path class="robot-trace" d="M888 297h20l6 7v12m-26-10h12v12"></path>
-          <path class="robot-highlight" d="M1034 270l175-11M774 297h47M695 299h41M635 303h27"
-          ></path>
-          <circle class="status-light" cx="898" cy="312" r="3"></circle>
-
-          <circle class="joint" cx="848" cy="324" r="8"></circle>
-          <g transform="rotate(-16 848 324)">
-            <rect class="hand-silhouette" x="784" y="315.5" width="62" height="17" rx="8.5"></rect>
-          </g>
-          <circle class="joint" cx="786" cy="342" r="6.5"></circle>
-          <g transform="rotate(-30 786 342)">
-            <rect class="hand-silhouette" x="736" y="334" width="50" height="16" rx="8"></rect>
-          </g>
-
-          <circle class="joint" cx="854" cy="344" r="7"></circle>
-          <g transform="rotate(-22 854 344)">
-            <rect class="hand-silhouette" x="796" y="336" width="58" height="16" rx="8"></rect>
-          </g>
-          <circle class="joint" cx="800" cy="366" r="6"></circle>
-          <g transform="rotate(-36 800 366)">
-            <rect class="hand-silhouette" x="756" y="358.5" width="44" height="15" rx="7.5"></rect>
-          </g>
-
-          <circle class="joint" cx="860" cy="360" r="6"></circle>
-          <g transform="rotate(-28 860 360)">
-            <rect class="hand-silhouette" x="814" y="353" width="46" height="14" rx="7"></rect>
-          </g>
-
-          <circle class="joint" cx="886" cy="362" r="8"></circle>
-          <g transform="rotate(-48 886 362)">
-            <rect class="hand-silhouette" x="830" y="353" width="56" height="18" rx="9"></rect>
-          </g>
-        </g>
-      </g>
-    </svg>
-
-    <div class="connection-spark" aria-hidden="true">
-      <span class="spark-core"></span>
-      <span class="spark-ring"></span>
-      <span class="spark-ring spark-ring--delayed"></span>
-    </div>
-  </div>
-  <div class="scene-caption" aria-hidden="true">
-    <span class="scene-caption__label">Human intuition</span>
-    <span class="scene-caption__center"
-      ><span></span> <span data-connection-label>In connection</span></span
-    >
-    <span class="scene-caption__label">Machine intelligence</span>
   </div>
 </div>
 
 <script>
   const scene = document.querySelector<HTMLElement>('[data-hands-scene]');
   if (scene) {
-    // Keep the renderer out of the critical page bundle. The static illustration
-    // remains visible until a complete WebGL frame has rendered successfully.
     const load = new IntersectionObserver(
       ([entry]) => {
         if (!entry.isIntersecting) return;

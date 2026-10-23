@@ -24,32 +24,35 @@ robot.name = 'robot';
 root.add(human, robot);
 const skin = new THREE.MeshStandardMaterial({
   name: 'warm-paper',
-  color: '#d6b89a',
-  roughness: 0.82,
+  color: '#c9c2b6',
+  roughness: 0.96,
+  flatShading: true,
 });
 const porcelain = new THREE.MeshStandardMaterial({
   name: 'porcelain',
-  color: '#c1cdd0',
-  roughness: 0.5,
-  metalness: 0.22,
+  color: '#c9c2b6',
+  roughness: 0.96,
+  metalness: 0,
+  flatShading: true,
 });
 const graphite = new THREE.MeshStandardMaterial({
   name: 'graphite',
-  color: '#45545b',
-  roughness: 0.65,
-  metalness: 0.45,
+  color: '#b9b0a2',
+  roughness: 0.96,
+  metalness: 0,
+  flatShading: true,
 });
 const ink = new THREE.LineBasicMaterial({
   name: 'human-ink',
-  color: '#685346',
+  color: '#827666',
   transparent: true,
-  opacity: 0.46,
+  opacity: 0.32,
 });
 const robotInk = new THREE.LineBasicMaterial({
   name: 'robot-ink',
-  color: '#425860',
+  color: '#827666',
   transparent: true,
-  opacity: 0.5,
+  opacity: 0.32,
 });
 const faintInk = new THREE.LineBasicMaterial({
   name: 'construction-ink',
@@ -74,8 +77,8 @@ const fingers = [
     points: [
       [-2.9, -0.64, 0],
       [-2.0, -0.85, -0.06],
-      [-1.1, -1.1, -0.23],
-      [-0.65, -1.32, -0.35],
+      [-1.3, -1.05, -0.28],
+      [-1.0, -1.12, -0.58],
     ],
     radii: [0.28, 0.245, 0.21, 0.18],
   },
@@ -84,8 +87,8 @@ const fingers = [
     points: [
       [-3.1, -1.18, -0.02],
       [-2.32, -1.52, -0.16],
-      [-1.6, -1.82, -0.4],
-      [-1.28, -1.94, -0.52],
+      [-1.8, -1.62, -0.42],
+      [-1.65, -1.64, -0.72],
     ],
     radii: [0.25, 0.22, 0.185, 0.16],
   },
@@ -94,8 +97,8 @@ const fingers = [
     points: [
       [-3.55, -1.63, -0.06],
       [-2.9, -2.03, -0.15],
-      [-2.37, -2.22, -0.38],
-      [-2.1, -2.23, -0.49],
+      [-2.5, -1.95, -0.42],
+      [-2.35, -1.92, -0.65],
     ],
     radii: [0.22, 0.185, 0.16, 0.14],
   },
@@ -118,8 +121,8 @@ function bone(a, b, ra, rb) {
 for (const finger of fingers)
   for (let i = 0; i < 3; i++)
     bone(finger.points[i], finger.points[i + 1], finger.radii[i], finger.radii[i + 1]);
-bone([-26, -0.85, -0.05], [-5.5, -0.83, 0], 0.76, 0.43);
-bone([-5.6, -0.83, 0], [-4.5, -0.73, 0], 0.43, 0.55);
+bone([-9.6, -0.85, -0.05], [-5.5, -0.83, 0], 1.12, 0.62);
+bone([-5.6, -0.83, 0], [-4.5, -0.73, 0], 0.62, 0.66);
 const ellipsoids = [
   [-3.9, -0.74, 0, 1.5, 0.94, 0.39],
   [-3.9, 0.05, 0.02, 0.79, 0.5, 0.38],
@@ -154,9 +157,9 @@ function field(x, y, z) {
 
 // Surface nets: one vertex per occupied cell, with smooth normals from the
 // implicit skin field. The palm, wrist and fingers form one continuous mesh.
-const step = 0.085,
-  min = [-27, -3.1, -1.2],
-  size = [324, 65, 30];
+const step = 0.16,
+  min = [-11.1, -3.3, -1.4],
+  size = [74, 35, 19];
 const [nx, ny, nz] = size,
   stride = nx * ny;
 const sample = new Float32Array(nx * ny * nz);
@@ -249,6 +252,7 @@ geometry.setIndex(indices);
 const sculpture = new THREE.Mesh(geometry, skin);
 sculpture.name = 'continuous-skin';
 human.add(sculpture);
+human.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 28), faintInk));
 
 function stroke(group, points, material = ink) {
   group.add(
@@ -281,9 +285,7 @@ function surfaceRing(x, y, z, seed = 0) {
 }
 // Sparse construction loops and longitudinal contours, rather than a dense
 // triangulation. Small deterministic irregularities give the ink a drawn feel.
-const armRings = [-13, -10, -7.5, -5.6, -4.9, -4.2, -3.55, -2.95].map((x, i) =>
-  surfaceRing(x, -0.8, 0, i),
-);
+const armRings = [-8.7, -7, -5.6, -4.8, -3.9, -2.95].map((x, i) => surfaceRing(x, -0.8, 0, i));
 for (const ring of armRings) stroke(human, ring);
 for (const k of [3, 7, 11, 15])
   stroke(
@@ -311,7 +313,12 @@ for (const finger of fingers) {
     radius = finger.radii[3];
   const nail = new THREE.Mesh(
     new THREE.SphereGeometry(1, 16, 8),
-    new THREE.MeshStandardMaterial({ name: 'nail', color: '#e5d0b9', roughness: 0.8 }),
+    new THREE.MeshStandardMaterial({
+      name: 'nail',
+      color: '#d5cec2',
+      roughness: 0.96,
+      flatShading: true,
+    }),
   );
   nail.scale.set(radius * 0.9, radius * 0.7, 0.025);
   nail.position.set(tip[0] - radius * 0.35, tip[1], tip[2] + radius / 1.15 - 0.005);
@@ -374,7 +381,7 @@ function link(group, a, b, r, material = porcelain) {
   const delta = v(b).sub(v(a));
   const item = mesh(
     group,
-    new THREE.CapsuleGeometry(r, Math.max(0.02, delta.length() - r * 2), 6, 12),
+    new THREE.CapsuleGeometry(r, Math.max(0.02, delta.length() - r * 2), 2, 6),
     material,
     v(a).add(v(b)).multiplyScalar(0.5).toArray(),
   );
@@ -383,43 +390,67 @@ function link(group, a, b, r, material = porcelain) {
 }
 const robotPalm = outlinedBox(robot, 2.25, 1.8, 0.67, [-3.8, -0.72, 0], 0.26);
 robotPalm.rotation.z = 0.06;
-outlinedBox(robot, 1.1, 0.95, 0.1, [-3.95, -0.7, 0.38], 0.12, graphite);
-outlinedBox(robot, 1.1, 0.95, 0.1, [-3.95, -0.7, -0.38], 0.12, graphite);
-for (const y of [-0.4, -0.72, -1.04])
-  outlinedBox(robot, 0.28, 0.04, 0.03, [-4.06, y, -0.45], 0.01, porcelain);
-// Inlaid circuit, exposed knuckles, and seam lines sit in 3D on the shell.
-stroke(
-  robot,
-  [
-    [-4.3, -0.35, 0.45],
-    [-3.87, -0.35, 0.45],
-    [-3.65, -0.55, 0.45],
-    [-3.65, -1, 0.45],
-  ],
-  robotInk,
-);
-for (const y of [-0.4, -0.72, -1.04])
-  outlinedBox(robot, 0.28, 0.04, 0.03, [-4.06, y, 0.45], 0.01, porcelain);
-link(robot, [-5.15, -0.8, 0], [-5.15, -0.8, 0.01], 0.51, graphite);
-outlinedBox(robot, 22, 1.03, 0.82, [-16.45, -0.8, 0], 0.28);
-for (const x of [-6.4, -8, -10, -12]) {
+// Quiet paper panels and a broad, tapered wrist replace the display and bar.
+for (const side of [-1, 1]) {
+  const z = side * 0.35;
   stroke(
     robot,
     [
-      [x, -1.31, 0.2],
-      [x, -1.2, 0.42],
-      [x, -0.4, 0.42],
-      [x, -0.29, 0.2],
+      [-4.6, -1.23, z],
+      [-3.3, -0.16, z],
+      [-3.04, -1.15, z],
+      [-4.6, -1.23, z],
+    ],
+    faintInk,
+  );
+  stroke(
+    robot,
+    [
+      [-4.55, -0.17, z],
+      [-3.3, -0.16, z],
     ],
     robotInk,
   );
+}
+link(robot, [-5.15, -0.8, 0], [-5.15, -0.8, 0.01], 0.61, graphite);
+const armProfile = [
+  [0, 0],
+  [1.08, 0],
+  [1.12, 0.18],
+  [1.03, 0.85],
+  [0.8, 2.5],
+  [0.62, 4.05],
+  [0.6, 4.2],
+  [0, 4.2],
+];
+const arm = mesh(
+  robot,
+  new THREE.LatheGeometry(
+    armProfile.map(([r, y]) => new THREE.Vector2(r, y)),
+    8,
+  ),
+  porcelain,
+  [-9.7, -0.8, 0],
+);
+arm.rotation.z = -Math.PI / 2;
+arm.scale.z = 0.8;
+for (const [x, radius] of [
+  [-8.7, 1.04],
+  [-7.1, 0.82],
+  [-5.7, 0.62],
+]) {
+  const ring = Array.from({ length: 17 }, (_, i) => {
+    const a = (i / 16) * Math.PI * 2;
+    return [x, -0.8 + Math.cos(a) * (radius + 0.012), Math.sin(a) * (radius * 0.8 + 0.012)];
+  });
+  stroke(robot, ring, robotInk);
 }
 for (const finger of fingers) {
   for (let i = 0; i < 3; i++) {
     const a = finger.points[i],
       b = finger.points[i + 1];
     link(robot, a, b, finger.radii[i] * 0.79);
-    const joint = mesh(robot, new THREE.SphereGeometry(finger.radii[i] * 0.88, 12, 8), graphite, a);
+    const joint = mesh(robot, new THREE.SphereGeometry(finger.radii[i] * 0.88, 6, 4), graphite, a);
     joint.scale.z = 0.9;
     const hinge = mesh(
       robot,
