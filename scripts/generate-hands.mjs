@@ -1,9 +1,8 @@
-// Authored geometry: no downloaded models, textures, or runtime mesh generation.
-// Run `npm run generate:hands` after changing the sculpture or its ink contours.
+// Authored folded-sheet geometry. Every visible surface is a paper panel;
+// there are no spheres, tubes, skin fields, or rounded solid primitives.
 import * as THREE from 'three';
 import { GLTFExporter } from 'three/addons/exporters/GLTFExporter.js';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
-import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
 import { writeFile } from 'node:fs/promises';
 
 globalThis.FileReader = class {
@@ -15,518 +14,263 @@ globalThis.FileReader = class {
   }
 };
 
-const v = (p) => new THREE.Vector3(...p);
+const paper = new THREE.MeshStandardMaterial({
+  name: 'paper',
+  color: '#c9c2b6',
+  roughness: 0.98,
+  metalness: 0,
+  flatShading: true,
+  side: THREE.DoubleSide,
+});
+const cut = new THREE.MeshStandardMaterial({
+  name: 'paper-edge',
+  color: '#bdb3a3',
+  roughness: 1,
+  metalness: 0,
+  flatShading: true,
+  side: THREE.DoubleSide,
+});
+const pencil = new THREE.LineBasicMaterial({
+  name: 'crease',
+  color: '#827666',
+  transparent: true,
+  opacity: 0.36,
+});
+const faintPencil = new THREE.LineBasicMaterial({
+  name: 'pencil-echo',
+  color: '#827666',
+  transparent: true,
+  opacity: 0.14,
+});
 const root = new THREE.Group();
 const human = new THREE.Group();
 human.name = 'human';
 const robot = new THREE.Group();
 robot.name = 'robot';
+robot.scale.x = -1;
 root.add(human, robot);
-const skin = new THREE.MeshStandardMaterial({
-  name: 'warm-paper',
-  color: '#c9c2b6',
-  roughness: 0.96,
-  flatShading: true,
-});
-const porcelain = new THREE.MeshStandardMaterial({
-  name: 'porcelain',
-  color: '#c9c2b6',
-  roughness: 0.96,
-  metalness: 0,
-  flatShading: true,
-});
-const graphite = new THREE.MeshStandardMaterial({
-  name: 'graphite',
-  color: '#b9b0a2',
-  roughness: 0.96,
-  metalness: 0,
-  flatShading: true,
-});
-const ink = new THREE.LineBasicMaterial({
-  name: 'human-ink',
-  color: '#827666',
-  transparent: true,
-  opacity: 0.32,
-});
-const robotInk = new THREE.LineBasicMaterial({
-  name: 'robot-ink',
-  color: '#827666',
-  transparent: true,
-  opacity: 0.32,
-});
-const faintInk = new THREE.LineBasicMaterial({
-  name: 'construction-ink',
-  color: '#79644e',
-  transparent: true,
-  opacity: 0.23,
-});
+const v = (p) => new THREE.Vector3(...p);
 
+function stroke(group, points, material = pencil) {
+  const vertices = points.map((p) => v(p).add(new THREE.Vector3(0, 0, 0.006)));
+  group.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(vertices), material));
+}
+function panels(group, triangles, material = paper) {
+  const positions = triangles.flat(2);
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.computeVertexNormals();
+  group.add(new THREE.Mesh(geometry, material));
+}
+function quad(a, b, c, d) {
+  return [
+    [a, b, c],
+    [a, c, d],
+  ];
+}
+function mark(group, p) {
+  const s = 0.025;
+  stroke(
+    group,
+    [
+      [p[0] - s, p[1], p[2] + 0.008],
+      [p[0] + s, p[1], p[2] + 0.008],
+    ],
+    faintPencil,
+  );
+  stroke(
+    group,
+    [
+      [p[0], p[1] - s, p[2] + 0.008],
+      [p[0], p[1] + s, p[2] + 0.008],
+    ],
+    faintPencil,
+  );
+}
+
+// A folded paper strip has two broad pitched faces, an underside, and narrow
+// cut edges. Each change in pitch is a physical knuckle fold.
+function foldedStrip(group, centers, widths, ridges, segmented = false) {
+  const ribs = centers.map((p, i) => {
+    const before = v(centers[Math.max(0, i - 1)]),
+      after = v(centers[Math.min(centers.length - 1, i + 1)]);
+    const tangent = after.sub(before).normalize();
+    const normal = new THREE.Vector3(-tangent.y, tangent.x, 0).normalize();
+    const left = v(p).addScaledVector(normal, widths[i]).toArray();
+    const right = v(p).addScaledVector(normal, -widths[i]).toArray();
+    const ridge = [p[0], p[1], p[2] + ridges[i]];
+    return [left, ridge, right];
+  });
+  for (let i = 0; i < ribs.length - 1; i++) {
+    let a = ribs[i],
+      b = ribs[i + 1];
+    // Robotic fingers are made from separately folded paper links.
+    if (segmented && i > 0) a = a.map((p, k) => v(p).lerp(v(b[k]), 0.045).toArray());
+    panels(group, [...quad(a[0], b[0], b[1], a[1]), ...quad(a[1], b[1], b[2], a[2])]);
+    const backA = a.map((p) => [p[0], p[1], p[2] - 0.035]);
+    const backB = b.map((p) => [p[0], p[1], p[2] - 0.035]);
+    panels(group, [
+      ...quad(backA[2], backB[2], backB[1], backA[1]),
+      ...quad(backA[1], backB[1], backB[0], backA[0]),
+    ]);
+    panels(
+      group,
+      [...quad(a[0], backA[0], backB[0], b[0]), ...quad(b[2], backB[2], backA[2], a[2])],
+      cut,
+    );
+    stroke(group, [a[0], b[0]]);
+    stroke(group, [a[2], b[2]]);
+    stroke(group, [a[1], b[1]], faintPencil);
+    if (i > 0) stroke(group, [a[0], a[1], a[2]]);
+  }
+  const end = ribs.at(-1);
+  stroke(group, end);
+  for (const rib of ribs.slice(1, -1)) mark(group, rib[1]);
+}
+
+// The palm is an origami fan: large planar triangles meet along a raised fold.
+function foldedPalm(group, mechanical) {
+  const outline = mechanical
+    ? [
+        [-5.25, -0.05, 0.02],
+        [-4.6, 0.26, 0.04],
+        [-2.85, 0.25, 0.01],
+        [-2.68, -0.3, 0.01],
+        [-2.9, -1.05, -0.02],
+        [-3.5, -1.83, -0.04],
+        [-4.55, -1.55, -0.02],
+        [-5.3, -1.23, 0.01],
+      ]
+    : [
+        [-5.25, -0.07, 0.01],
+        [-4.45, 0.25, 0.07],
+        [-3.5, 0.35, 0.03],
+        [-2.8, 0.24, 0.01],
+        [-2.75, -0.6, 0.01],
+        [-3.05, -1.25, -0.04],
+        [-3.55, -1.8, -0.04],
+        [-4.5, -1.57, -0.02],
+        [-5.3, -1.22, 0.01],
+      ];
+  const ridge = mechanical ? [-3.98, -0.65, 0.48] : [-4.02, -0.65, 0.4];
+  const underside = [-4.05, -0.67, -0.09];
+  for (let i = 0; i < outline.length; i++) {
+    const a = outline[i],
+      b = outline[(i + 1) % outline.length];
+    panels(group, [[a, b, ridge]]);
+    const ba = [a[0], a[1], a[2] - 0.04],
+      bb = [b[0], b[1], b[2] - 0.04];
+    panels(group, [[bb, ba, underside]]);
+    panels(group, quad(a, ba, bb, b), cut);
+    stroke(group, [a, b]);
+    // Only structural folds are traced; the remaining folds read through light.
+    if (i % 2 === 0) stroke(group, [a, ridge], faintPencil);
+  }
+  mark(group, ridge);
+  foldedStrip(
+    group,
+    [
+      [-7.7, -0.66, -0.08],
+      [-6.8, -0.65, -0.04],
+      [-5.25, -0.65, 0],
+    ],
+    [0.91, 0.82, 0.6],
+    [0.43, 0.36, 0.27],
+  );
+}
 const fingers = [
   {
     name: 'index',
     points: [
       [-2.9, 0, 0],
-      [-1.9, 0.08, 0.04],
-      [-0.85, 0.04, 0.02],
-      [-0.18, 0, 0],
+      [-1.87, 0.07, 0.03],
+      [-0.75, 0.03, 0.015],
+      [0, 0, 0],
     ],
-    radii: [0.27, 0.23, 0.195, 0.18],
+    widths: [0.28, 0.245, 0.19, 0.004],
+    folds: [0.18, 0.16, 0.12, 0],
   },
   {
     name: 'middle',
     points: [
-      [-2.9, -0.64, 0],
-      [-2.0, -0.85, -0.06],
-      [-1.3, -1.05, -0.28],
-      [-1.0, -1.12, -0.58],
+      [-2.9, -0.58, 0],
+      [-2.02, -0.77, -0.02],
+      [-1.3, -0.93, -0.24],
+      [-1.08, -0.88, -0.49],
     ],
-    radii: [0.28, 0.245, 0.21, 0.18],
+    widths: [0.28, 0.245, 0.2, 0.025],
+    folds: [0.18, 0.16, 0.1, 0.02],
   },
   {
     name: 'ring',
     points: [
-      [-3.1, -1.18, -0.02],
-      [-2.32, -1.52, -0.16],
-      [-1.8, -1.62, -0.42],
-      [-1.65, -1.64, -0.72],
+      [-3.1, -1.13, -0.02],
+      [-2.34, -1.44, -0.1],
+      [-1.8, -1.52, -0.4],
+      [-1.65, -1.45, -0.63],
     ],
-    radii: [0.25, 0.22, 0.185, 0.16],
+    widths: [0.245, 0.22, 0.18, 0.02],
+    folds: [0.16, 0.13, 0.09, 0.01],
   },
   {
     name: 'little',
     points: [
-      [-3.55, -1.63, -0.06],
-      [-2.9, -2.03, -0.15],
-      [-2.5, -1.95, -0.42],
-      [-2.35, -1.92, -0.65],
+      [-3.55, -1.62, -0.03],
+      [-2.96, -1.91, -0.14],
+      [-2.52, -1.9, -0.39],
+      [-2.4, -1.81, -0.57],
     ],
-    radii: [0.22, 0.185, 0.16, 0.14],
+    widths: [0.205, 0.18, 0.145, 0.02],
+    folds: [0.14, 0.12, 0.07, 0.01],
   },
   {
     name: 'thumb',
     points: [
-      [-4.25, -0.1, 0.05],
-      [-3.65, 0.66, 0.13],
-      [-3.02, 1.08, 0.02],
-      [-2.52, 1.08, -0.12],
+      [-4.43, -0.04, 0.07],
+      [-3.82, 0.65, 0.16],
+      [-3.18, 1.07, 0.04],
+      [-2.68, 0.96, -0.11],
     ],
-    radii: [0.38, 0.31, 0.245, 0.215],
+    widths: [0.36, 0.31, 0.23, 0.025],
+    folds: [0.2, 0.17, 0.1, 0.01],
   },
 ];
-const bones = [];
-function bone(a, b, ra, rb) {
-  const d = b.map((n, i) => n - a[i]);
-  bones.push({ a, d, length2: d.reduce((sum, n) => sum + n * n, 0), ra, rb });
-}
-for (const finger of fingers)
-  for (let i = 0; i < 3; i++)
-    bone(finger.points[i], finger.points[i + 1], finger.radii[i], finger.radii[i + 1]);
-bone([-9.6, -0.85, -0.05], [-5.5, -0.83, 0], 1.12, 0.62);
-bone([-5.6, -0.83, 0], [-4.5, -0.73, 0], 0.62, 0.66);
-const ellipsoids = [
-  [-3.9, -0.74, 0, 1.5, 0.94, 0.39],
-  [-3.9, 0.05, 0.02, 0.79, 0.5, 0.38],
-  [-3.45, -1.25, -0.03, 0.75, 0.65, 0.33],
-];
-const smoothMin = (a, b, k = 0.16) => {
-  const h = Math.max(k - Math.abs(a - b), 0) / k;
-  return Math.min(a, b) - h * h * k * 0.25;
-};
-function field(x, y, z) {
-  let distance = 100;
-  for (const e of ellipsoids) {
-    const px = x - e[0],
-      py = y - e[1],
-      pz = z - e[2];
-    const k0 = Math.hypot(px / e[3], py / e[4], pz / e[5]);
-    const k1 = Math.hypot(px / e[3] ** 2, py / e[4] ** 2, pz / e[5] ** 2);
-    distance = smoothMin(distance, (k0 * (k0 - 1)) / Math.max(k1, 0.00001), 0.22);
-  }
-  for (const b of bones) {
-    const px = x - b.a[0],
-      py = y - b.a[1],
-      pz = z - b.a[2];
-    const t = Math.max(0, Math.min(1, (px * b.d[0] + py * b.d[1] + pz * b.d[2]) / b.length2));
-    const d =
-      Math.hypot(px - t * b.d[0], py - t * b.d[1], (pz - t * b.d[2]) * 1.15) -
-      THREE.MathUtils.lerp(b.ra, b.rb, t);
-    distance = smoothMin(distance, d);
-  }
-  return distance;
-}
-
-// Surface nets: one vertex per occupied cell, with smooth normals from the
-// implicit skin field. The palm, wrist and fingers form one continuous mesh.
-const step = 0.16,
-  min = [-11.1, -3.3, -1.4],
-  size = [74, 35, 19];
-const [nx, ny, nz] = size,
-  stride = nx * ny;
-const sample = new Float32Array(nx * ny * nz);
-const cells = new Int32Array(sample.length).fill(-1);
-const offsets = [0, 1, nx, nx + 1, stride, stride + 1, stride + nx, stride + nx + 1];
-const corners = [
-  [0, 0, 0],
-  [1, 0, 0],
-  [0, 1, 0],
-  [1, 1, 0],
-  [0, 0, 1],
-  [1, 0, 1],
-  [0, 1, 1],
-  [1, 1, 1],
-];
-const edges = [
-  [0, 1],
-  [2, 3],
-  [4, 5],
-  [6, 7],
-  [0, 2],
-  [1, 3],
-  [4, 6],
-  [5, 7],
-  [0, 4],
-  [1, 5],
-  [2, 6],
-  [3, 7],
-];
-for (let z = 0; z < nz; z++)
-  for (let y = 0; y < ny; y++)
-    for (let x = 0; x < nx; x++)
-      sample[x + y * nx + z * stride] = field(
-        min[0] + x * step,
-        min[1] + y * step,
-        min[2] + z * step,
-      );
-const positions = [],
-  normals = [],
-  indices = [];
-for (let z = 0; z < nz - 1; z++)
-  for (let y = 0; y < ny - 1; y++)
-    for (let x = 0; x < nx - 1; x++) {
-      const i = x + y * nx + z * stride;
-      const values = offsets.map((o) => sample[i + o]);
-      if (values.every((n) => n >= 0) || values.every((n) => n < 0)) continue;
-      const p = [0, 0, 0];
-      let count = 0;
-      for (const [a, b] of edges)
-        if (values[a] < 0 !== values[b] < 0) {
-          const t = values[a] / (values[a] - values[b]);
-          for (let d = 0; d < 3; d++) p[d] += corners[a][d] + t * (corners[b][d] - corners[a][d]);
-          count++;
-        }
-      for (let d = 0; d < 3; d++) p[d] = min[d] + ([x, y, z][d] + p[d] / count) * step;
-      cells[i] = positions.length / 3;
-      positions.push(...p);
-      const h = 0.015;
-      const normal = new THREE.Vector3(
-        field(p[0] + h, p[1], p[2]) - field(p[0] - h, p[1], p[2]),
-        field(p[0], p[1] + h, p[2]) - field(p[0], p[1] - h, p[2]),
-        field(p[0], p[1], p[2] + h) - field(p[0], p[1], p[2] - h),
-      ).normalize();
-      normals.push(...normal.toArray());
-    }
-function quad(a, b, c, d) {
-  if ([a, b, c, d].some((i) => i < 0)) return;
-  const pa = new THREE.Vector3().fromArray(positions, a * 3),
-    pb = new THREE.Vector3().fromArray(positions, b * 3),
-    pc = new THREE.Vector3().fromArray(positions, c * 3);
-  const normal = new THREE.Vector3().fromArray(normals, a * 3);
-  if (pb.sub(pa).cross(pc.sub(pa)).dot(normal) > 0) indices.push(a, b, c, a, c, d);
-  else indices.push(a, c, b, a, d, c);
-}
-for (let z = 1; z < nz - 1; z++)
-  for (let y = 1; y < ny - 1; y++)
-    for (let x = 1; x < nx - 1; x++) {
-      const i = x + y * nx + z * stride;
-      if (sample[i] < 0 !== sample[i + 1] < 0)
-        quad(cells[i], cells[i - nx], cells[i - nx - stride], cells[i - stride]);
-      if (sample[i] < 0 !== sample[i + nx] < 0)
-        quad(cells[i], cells[i - stride], cells[i - stride - 1], cells[i - 1]);
-      if (sample[i] < 0 !== sample[i + stride] < 0)
-        quad(cells[i], cells[i - 1], cells[i - 1 - nx], cells[i - nx]);
-    }
-const geometry = new THREE.BufferGeometry();
-geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-geometry.setAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
-geometry.setIndex(indices);
-const sculpture = new THREE.Mesh(geometry, skin);
-sculpture.name = 'continuous-skin';
-human.add(sculpture);
-human.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry, 28), faintInk));
-
-function stroke(group, points, material = ink) {
-  group.add(
-    new THREE.Line(
-      new THREE.BufferGeometry().setFromPoints(points.map((p) => (Array.isArray(p) ? v(p) : p))),
-      material,
-    ),
-  );
-}
-function surfaceRing(x, y, z, seed = 0) {
-  const points = [];
-  for (let i = 0; i <= 32; i++) {
-    const theta = (i / 32) * Math.PI * 2;
-    let lo = 0,
-      hi = 0.025;
-    // Find the first boundary; a long ray can otherwise hit a neighboring finger.
-    while (hi < 2.6 && field(x, y + Math.cos(theta) * hi, z + Math.sin(theta) * hi) < 0) {
-      lo = hi;
-      hi += 0.025;
-    }
-    for (let j = 0; j < 16; j++) {
-      const r = (lo + hi) / 2;
-      if (field(x, y + Math.cos(theta) * r, z + Math.sin(theta) * r) > 0) hi = r;
-      else lo = r;
-    }
-    const r = hi + 0.018 + Math.sin(i * 2.7 + seed) * 0.004;
-    points.push([x, y + Math.cos(theta) * r, z + Math.sin(theta) * r]);
-  }
-  return points;
-}
-// Sparse construction loops and longitudinal contours, rather than a dense
-// triangulation. Small deterministic irregularities give the ink a drawn feel.
-const armRings = [-8.7, -7, -5.6, -4.8, -3.9, -2.95].map((x, i) => surfaceRing(x, -0.8, 0, i));
-for (const ring of armRings) stroke(human, ring);
-for (const k of [3, 7, 11, 15])
-  stroke(
-    human,
-    armRings.map((r) => r[k]),
-    faintInk,
-  );
-for (let r = 4; r < armRings.length - 1; r++)
-  for (const k of [4, 8, 12]) stroke(human, [armRings[r][k], armRings[r + 1][k + 3]], faintInk);
-for (const finger of fingers) {
-  for (let i = 1; i < 4; i++) {
-    const p = finger.points[i];
-    if (finger.name === 'thumb') {
-      const radius = finger.radii[i] + 0.022;
-      const loop = Array.from({ length: 25 }, (_, j) => {
-        const a = (j / 24) * Math.PI * 2;
-        return [p[0], p[1] + Math.cos(a) * radius, p[2] + (Math.sin(a) * radius) / 1.15];
-      });
-      stroke(human, loop);
-    } else stroke(human, surfaceRing(...p, i));
-  }
-  const top = finger.points.map((p, i) => [p[0], p[1], p[2] + finger.radii[i] / 1.15 + 0.022]);
-  stroke(human, top, faintInk);
-  const tip = finger.points[3],
-    radius = finger.radii[3];
-  const nail = new THREE.Mesh(
-    new THREE.SphereGeometry(1, 16, 8),
-    new THREE.MeshStandardMaterial({
-      name: 'nail',
-      color: '#d5cec2',
-      roughness: 0.96,
-      flatShading: true,
-    }),
-  );
-  nail.scale.set(radius * 0.9, radius * 0.7, 0.025);
-  nail.position.set(tip[0] - radius * 0.35, tip[1], tip[2] + radius / 1.15 - 0.005);
-  human.add(nail);
-}
-
-function mesh(group, geometry, material, position) {
-  const item = new THREE.Mesh(geometry, material);
-  item.position.copy(v(position));
-  group.add(item);
-  return item;
-}
-function outlinedBox(group, w, h, d, position, r = 0.12, material = porcelain) {
-  const box = mesh(group, new RoundedBoxGeometry(w, h, d, 3, r), material, position);
-  const outline = new THREE.LineSegments(new THREE.EdgesGeometry(box.geometry, 18), robotInk);
-  box.add(outline);
-  // Sketch the flat face on both sides so the ink survives spatial rotation.
-  for (const side of [-1, 1]) {
-    const x = Math.max(0.01, w / 2 - r - 0.015);
-    const y = Math.max(0.01, h / 2 - r - 0.015);
-    const z = side * (d / 2 + 0.012);
-    stroke(
-      box,
-      [
-        [-x, -y, z],
-        [x, -y, z],
-        [x, y, z],
-        [-x, y, z],
-        [-x, -y, z],
-      ],
-      robotInk,
-    );
-    for (const [px, py] of [
-      [-x, -y],
-      [x, -y],
-      [x, y],
-      [-x, y],
-    ]) {
-      stroke(
-        box,
-        [
-          [px - 0.035, py, z],
-          [px + 0.035, py, z],
-        ],
-        robotInk,
-      );
-      stroke(
-        box,
-        [
-          [px, py - 0.035, z],
-          [px, py + 0.035, z],
-        ],
-        robotInk,
-      );
-    }
-  }
-  return box;
-}
-function link(group, a, b, r, material = porcelain) {
-  const delta = v(b).sub(v(a));
-  const item = mesh(
-    group,
-    new THREE.CapsuleGeometry(r, Math.max(0.02, delta.length() - r * 2), 2, 6),
-    material,
-    v(a).add(v(b)).multiplyScalar(0.5).toArray(),
-  );
-  item.quaternion.setFromUnitVectors(new THREE.Vector3(0, 1, 0), delta.normalize());
-  return item;
-}
-const robotPalm = outlinedBox(robot, 2.25, 1.8, 0.67, [-3.8, -0.72, 0], 0.26);
-robotPalm.rotation.z = 0.06;
-// Quiet paper panels and a broad, tapered wrist replace the display and bar.
-for (const side of [-1, 1]) {
-  const z = side * 0.35;
-  stroke(
-    robot,
-    [
-      [-4.6, -1.23, z],
-      [-3.3, -0.16, z],
-      [-3.04, -1.15, z],
-      [-4.6, -1.23, z],
-    ],
-    faintInk,
-  );
-  stroke(
-    robot,
-    [
-      [-4.55, -0.17, z],
-      [-3.3, -0.16, z],
-    ],
-    robotInk,
-  );
-}
-link(robot, [-5.15, -0.8, 0], [-5.15, -0.8, 0.01], 0.61, graphite);
-const armProfile = [
-  [0, 0],
-  [1.08, 0],
-  [1.12, 0.18],
-  [1.03, 0.85],
-  [0.8, 2.5],
-  [0.62, 4.05],
-  [0.6, 4.2],
-  [0, 4.2],
-];
-const arm = mesh(
-  robot,
-  new THREE.LatheGeometry(
-    armProfile.map(([r, y]) => new THREE.Vector2(r, y)),
-    8,
-  ),
-  porcelain,
-  [-9.7, -0.8, 0],
-);
-arm.rotation.z = -Math.PI / 2;
-arm.scale.z = 0.8;
-for (const [x, radius] of [
-  [-8.7, 1.04],
-  [-7.1, 0.82],
-  [-5.7, 0.62],
+for (const [hand, mechanical] of [
+  [human, false],
+  [robot, true],
 ]) {
-  const ring = Array.from({ length: 17 }, (_, i) => {
-    const a = (i / 16) * Math.PI * 2;
-    return [x, -0.8 + Math.cos(a) * (radius + 0.012), Math.sin(a) * (radius * 0.8 + 0.012)];
-  });
-  stroke(robot, ring, robotInk);
+  foldedPalm(hand, mechanical);
+  for (const finger of fingers)
+    foldedStrip(hand, finger.points, finger.widths, finger.folds, mechanical);
 }
-for (const finger of fingers) {
-  for (let i = 0; i < 3; i++) {
-    const a = finger.points[i],
-      b = finger.points[i + 1];
-    link(robot, a, b, finger.radii[i] * 0.79);
-    const joint = mesh(robot, new THREE.SphereGeometry(finger.radii[i] * 0.88, 6, 4), graphite, a);
-    joint.scale.z = 0.9;
-    const hinge = mesh(
-      robot,
-      new THREE.CylinderGeometry(finger.radii[i] * 0.58, finger.radii[i] * 0.58, 0.07, 16),
-      porcelain,
-      [a[0], a[1], a[2] + finger.radii[i] * 0.82],
-    );
-    hinge.rotation.x = Math.PI / 2;
-    const mid = v(a).lerp(v(b), 0.5);
-    const normal = v(b).sub(v(a)).normalize();
-    const cross = new THREE.Vector3(-normal.y, normal.x, 0).multiplyScalar(finger.radii[i] * 0.82);
-    const top = mid.clone().add(new THREE.Vector3(0, 0, finger.radii[i] * 0.8));
-    stroke(robot, [top.clone().sub(cross), top, top.clone().add(cross)], robotInk);
-  }
-  link(
-    robot,
-    finger.points[3],
-    [finger.points[3][0] + 0.06, ...finger.points[3].slice(1)],
-    finger.radii[3],
-  );
-}
-// Discrete vertex dots on the construction lines reinforce the sketch model.
-const dotGeometry = new THREE.SphereGeometry(0.024, 6, 4);
-const dotMaterial = new THREE.MeshBasicMaterial({ name: 'vertex', color: '#6f6458' });
-for (const group of [human, robot])
-  for (const p of [
-    [-5.6, -0.8, 0.45],
-    [-4.2, -0.8, 0.42],
-    [-3.55, -0.8, 0.42],
-    ...fingers.flatMap((f) =>
-      f.points.slice(1).map((p, i) => [p[0], p[1], p[2] + f.radii[i + 1] / 1.15 + 0.03]),
-    ),
-  ])
-    mesh(group, dotGeometry, dotMaterial, p);
 
-// Bake the authored components into a handful of material batches. Individual
-// contours retain their depth, while mobile GPUs avoid hundreds of draw calls.
+// Batch panels and creases by material. The paper surfaces retain their flat
+// normals, while the scene needs only a few draw calls on mobile.
 for (const hand of [human, robot]) {
-  hand.updateMatrixWorld(true);
-  const meshBatches = new Map();
-  const lineBatches = new Map();
-  hand.traverse((object) => {
+  const meshBatches = new Map(),
+    lineBatches = new Map();
+  for (const object of [...hand.children]) {
     if (object instanceof THREE.Mesh) {
       const batch = meshBatches.get(object.material) ?? [];
-      const geometry = object.geometry.index
-        ? object.geometry.toNonIndexed()
-        : object.geometry.clone();
-      geometry.applyMatrix4(object.matrixWorld);
-      batch.push(geometry);
+      batch.push(object.geometry);
       meshBatches.set(object.material, batch);
     } else if (object instanceof THREE.Line) {
       const batch = lineBatches.get(object.material) ?? [];
-      const geometry = object.geometry.clone().applyMatrix4(object.matrixWorld);
-      const positions = geometry.getAttribute('position');
-      for (let i = 0; i < positions.count - 1; i += object instanceof THREE.LineSegments ? 2 : 1) {
-        for (const n of [i, i + 1])
-          batch.push(positions.getX(n), positions.getY(n), positions.getZ(n));
-      }
+      const p = object.geometry.getAttribute('position');
+      for (let i = 0; i < p.count - 1; i++)
+        for (const n of [i, i + 1]) batch.push(p.getX(n), p.getY(n), p.getZ(n));
       lineBatches.set(object.material, batch);
     }
-  });
-  hand.clear();
-  for (const [material, geometries] of meshBatches) {
-    const mesh = new THREE.Mesh(mergeVertices(mergeGeometries(geometries)), material);
-    mesh.name = material.name === 'warm-paper' ? 'continuous-skin' : material.name;
-    hand.add(mesh);
   }
+  hand.clear();
+  for (const [material, geometries] of meshBatches)
+    hand.add(new THREE.Mesh(mergeVertices(mergeGeometries(geometries)), material));
   for (const [material, positions] of lineBatches) {
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
     hand.add(new THREE.LineSegments(geometry, material));
   }
 }
-
 const data = await new GLTFExporter().parseAsync(root, { binary: true });
 await writeFile(new URL('../public/models/hands.glb', import.meta.url), Buffer.from(data));
-console.log(
-  `Wrote ${(data.byteLength / 1024).toFixed(0)} KB; skin ${positions.length / 3} vertices, ${indices.length / 3} triangles.`,
-);
+console.log(`Wrote ${(data.byteLength / 1024).toFixed(0)} KB of folded paper panels and creases.`);

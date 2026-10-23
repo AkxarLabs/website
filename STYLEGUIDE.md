@@ -19,20 +19,21 @@ human/AI hand concept.
 
 - `SiteHeader.astro`: brand mark, primary navigation, and persisted light/dark
   mode toggle.
-- `HandsConnection.astro` / `hands-scene.ts`: low-poly paper sculptures cup
-  the central headline from opposite sides, remaining apart. Both hands share
-  a warm, matte material close to the page background; dark mode uses charcoal
-  paper. Short, broad wrist fragments, flat facets, procedural paper grain,
-  pencil contours and vertex marks define the silhouettes. The human hand is a
-  continuous mesh; the robot has folded panels and articulated fingers, with no
-  metallic finish or display panel. The composition appears in the first viewport.
-  Scroll and pointer movement gently turn the hands without closing the center;
-  reduced motion fixes their pose. Rendering pauses when idle and offscreen.
+- `HandsConnection.astro` / `hands-scene.ts`: actual folded-sheet origami
+  hands below and around the headline. Broad planar palm panels, pitched finger
+  strips, raised creases, thin cut edges, and subtle pencil marks define the form;
+  no rounded skin or mechanical primitives are used. Both share matte paper colors
+  close to the background, with procedural grain and soft cast shadows. The wrists
+  remain short and broad. The initial fingertip gap is deliberately small. The first
+  ~180px of scrolling lower the fingers clear of the headline, then bring them
+  together diagonally. Both index tips are authored at local (0,0,0), so their
+  shared final positions preserve exact contact during pointer movement. Reduced
+  motion shows this joined pose. Rendering pauses when idle or offscreen.
   `scripts/generate-hands.mjs` authors `public/models/hands.glb`; run
-  `npm run generate:hands` after changing geometry or ink paths. The matching
-  transparent `hands-poster-*.png` renders cover loading, disabled JavaScript,
-  unavailable WebGL and context loss; refresh them when the composition changes.
-  Assets use content revisions and the configured base path for GitHub Pages.
+  `npm run generate:hands` after changing panels or creases. Matching transparent
+  `hands-poster-*.png` renders cover loading, disabled JavaScript, unavailable WebGL
+  and context loss; refresh them when the composition changes. All assets use
+  content revisions and the configured base path for static GitHub Pages.
 - `Footer.astro`: footer navigation, RSS link, and (newsletter signup removed until a real mailing list exists).
 - `PageLayout.astro`: shared layout for about, research, tag, and article pages.
 

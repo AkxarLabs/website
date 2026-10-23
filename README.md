@@ -62,9 +62,10 @@ Override these in Actions or another host with `SITE` and `BASE_PATH`.
 
 ## 3D hero artwork
 
-The hero uses local Three.js/WebGL paper sculptures with low-poly facets,
-pencil contours, and vertex marks framing the central headline. The renderer loads near the viewport and pauses when idle or offscreen.
-Reduced motion keeps the framing pose still; matching transparent poster renders
+The hero uses local Three.js/WebGL origami hands built from folded paper panels,
+pitched finger strips, creases, and thin cut edges. The hands begin close together
+and their fingertips meet during the first short scroll. The renderer loads near the viewport and pauses when idle or offscreen.
+Reduced motion shows the joined pose; matching transparent poster renders
 cover loading and browsers without WebGL or JavaScript.
 
 To change the authored hand shapes or sketch lines, edit

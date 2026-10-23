@@ -158,18 +158,23 @@ export async function mountHandsScene(element: HTMLElement) {
     pointerX = reduced.matches ? 0 : THREE.MathUtils.lerp(pointerX, targetX, smoothing);
     pointerY = reduced.matches ? 0 : THREE.MathUtils.lerp(pointerY, targetY, smoothing);
     const apart = 1 - clasp;
-    // The hands cup the copy from opposite sides, retaining an open center.
+    // First lower the fingertips clear of the headline, then close the gap.
+    // Both index tips are authored at local (0,0,0), so shared final positions
+    // create genuine contact independently of pointer rotation or screen size.
     const compact = host.clientWidth <= 900;
-    const copyWidth = hero?.querySelector<HTMLElement>('.hero-copy')?.clientWidth ?? 620;
-    const edge = compact ? 2.8 : Math.max(5.7, (copyWidth / host.clientWidth) * 12 + 0.3);
-    const scale = compact ? 0.8 : 1;
+    const scale = compact ? 0.84 : 0.86;
+    const horizontal = THREE.MathUtils.smoothstep(clasp, 0.2, 1);
+    const vertical = 1 - THREE.MathUtils.smoothstep(clasp, 0, 0.55);
+    const gap = (compact ? 1.0 : 1.35) * (1 - horizontal);
     human.scale.setScalar(scale);
-    robot.scale.setScalar(scale);
-    human.position.set(-edge - apart * 0.25, (compact ? 1.0 : 1.6) + apart * 0.2, 0.15);
-    human.rotation.set(0.22, -0.08 - apart * 0.08, -0.18 - apart * 0.05);
-    robot.position.set(edge + apart * 0.25, (compact ? -0.9 : -1.45) - apart * 0.2, -0.1);
-    robot.rotation.set(-0.08, Math.PI + 0.08 + apart * 0.08, -0.18 + apart * 0.05);
-    world.rotation.set(0.06 + pointerY * 0.07, pointerX * 0.09, 0);
+    robot.scale.set(-scale, scale, scale);
+    human.position.set(-gap, vertical * (compact ? 0.55 : 0.45), 0);
+    robot.position.set(gap, -vertical * (compact ? 0.55 : 0.45), 0);
+    human.rotation.set(0.12, -0.08 - apart * 0.08, -0.14 - apart * 0.05);
+    robot.rotation.set(-0.04, 0.08 + apart * 0.08, -0.14 + apart * 0.05);
+    world.rotation.set(0.03 + pointerY * 0.07, pointerX * 0.09, 0);
+    element.dataset.contactGap = human.position.distanceTo(robot.position).toFixed(4);
+    element.dataset.connected = clasp > 0.995 ? 'true' : 'false';
     renderer.render(scene, camera);
     element.style.setProperty('--clasp', clasp.toFixed(4));
     hero?.style.setProperty('--clasp', clasp.toFixed(4));
@@ -188,7 +193,8 @@ export async function mountHandsScene(element: HTMLElement) {
   };
   const onScroll = () => {
     const heroTop = hero ? hero.getBoundingClientRect().top + scrollY : 0;
-    const p = THREE.MathUtils.clamp((scrollY - heroTop) / Math.min(innerHeight * 0.36, 280), 0, 1);
+    const start = Math.max(0, heroTop - 120);
+    const p = THREE.MathUtils.clamp((scrollY - start) / Math.min(innerHeight * 0.22, 180), 0, 1);
     targetClasp = reduced.matches ? 1 : p * p * (3 - 2 * p);
     schedule();
   };
@@ -196,7 +202,7 @@ export async function mountHandsScene(element: HTMLElement) {
     const { width, height } = host.getBoundingClientRect();
     if (!width || !height) return;
     camera.aspect = width / height;
-    const worldWidth = width <= 900 ? 12 : 24;
+    const worldWidth = width <= 900 ? 16 : 20;
     camera.position.set(
       0,
       0.2,
@@ -237,10 +243,10 @@ export async function mountHandsScene(element: HTMLElement) {
           if (!(material instanceof THREE.MeshStandardMaterial)) continue;
           material.color.set(
             dark
-              ? material.name === 'graphite'
+              ? material.name === 'paper-edge'
                 ? 0x25231e
                 : 0x333028
-              : material.name === 'graphite'
+              : material.name === 'paper-edge'
                 ? 0xb9b0a2
                 : 0xc9c2b6,
           );

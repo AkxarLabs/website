@@ -233,9 +233,9 @@ textarea {
 
 .hero {
   margin: 0 auto;
-  min-height: min(720px, calc(100svh - 96px));
+  min-height: 0;
   overflow: visible;
-  padding: 0 24px 56px;
+  padding: 0 24px 38px;
   isolation: isolate;
   position: relative;
 }
@@ -243,7 +243,7 @@ textarea {
 .hero-copy {
   margin: 0 auto;
   max-width: 620px;
-  padding-top: clamp(70px, 11vh, 112px);
+  padding-top: clamp(30px, 5vh, 50px);
   position: relative;
   text-align: center;
   z-index: 2;
@@ -270,7 +270,7 @@ textarea {
   font-size: 1.04rem;
   line-height: 1.7;
   max-width: 480px;
-  margin-top: 26px;
+  margin-top: 6px;
 }
 
 .eyebrow,
@@ -407,16 +407,14 @@ button:focus-visible {
 
 .hands-scene {
   --clasp: 1;
-  --px: 0;
-  --py: 0;
-  --art-w: min(100vw, 1440px);
-  height: 100%;
-  left: 0;
-  margin: 0;
+  height: clamp(280px, 25vw, 360px);
+  left: 50%;
+  margin-left: -50vw;
+  margin-top: -100px;
   pointer-events: none;
-  position: absolute;
-  top: 0;
-  width: 100%;
+  position: relative;
+  width: 100vw;
+  z-index: -1;
 }
 
 .hands-depth {
@@ -1089,8 +1087,8 @@ button:focus-visible {
   }
 
   .hero h1 em {
-    margin-top: 100px;
-    margin-bottom: 60px;
+    margin-top: 0;
+    margin-bottom: 0;
     font-size: 1.2em;
   }
 
@@ -1100,9 +1098,8 @@ button:focus-visible {
   }
 
   .hands-scene {
-    --art-w: 680px;
-    top: 90px;
-    height: clamp(290px, 50vw, 440px);
+    height: clamp(220px, 31vw, 270px);
+    margin-top: -45px;
   }
 
   .hero .hero-actions {
@@ -1162,12 +1159,6 @@ button:focus-visible {
   border: 1px solid var(--line);
 }
 
-@media (max-width: 360px) {
-  .hands-scene {
-    top: 130px;
-  }
-}
-
 @media (min-width: 561px) and (max-width: 900px) {
   .hero {
     min-height: 650px;
@@ -1182,8 +1173,8 @@ button:focus-visible {
   }
 
   .hero h1 em {
-    margin-top: 100px;
-    margin-bottom: 60px;
+    margin-top: 0;
+    margin-bottom: 0;
     font-size: 1.2em;
   }
 
@@ -1193,9 +1184,8 @@ button:focus-visible {
   }
 
   .hands-scene {
-    --art-w: 680px;
-    top: 90px;
-    height: clamp(290px, 50vw, 440px);
+    height: clamp(220px, 31vw, 270px);
+    margin-top: -45px;
   }
 
   .hero .hero-actions {
